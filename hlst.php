@@ -6,6 +6,7 @@ Description: Wraps search terms in the HTML5 mark tag when referrer is a non-sec
 Version: 1.4
 Author: RavanH
 Author URI: http://status301.net/
+Text Domain: highlight-search-terms
 */
 
 /*  Copyright 2016  RavanH  (email : ravanhagen@gmail.com)
