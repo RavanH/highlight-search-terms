@@ -132,7 +132,7 @@ class HighlightSearchTerms {
 			foreach ($searches as $search) {
 				$filtered[] = esc_attr($search);
 			}
-		} elseif ( $search = $_GET['hlst'] or $search = get_query_var( 'bbp_search' ) ) {
+		} elseif ( ( isset($_GET['hlst']) and $search = $_GET['hlst'] ) or $search = get_query_var( 'bbp_search' ) ) {
 			// Click-through from search results page or bbPress search
 			// Use $_GET here because adding 'hlst' to query_vars will mess with static front page display, showing blog instead
 			
