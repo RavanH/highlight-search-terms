@@ -2,8 +2,8 @@
 /*
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
-Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&item_number=0%2e6&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.4
+Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&item_number=1%2e4&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
+Version: 1.4.1
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -92,11 +92,12 @@ class HighlightSearchTerms {
 		add_filter('post_type_link', array(__CLASS__,'append_search_query') );
 		add_filter('page_link', array(__CLASS__,'append_search_query') );
 		// TODO do this for bbPress search result links
+
 	}
 
 	public static function append_search_query( $url ) {
 		if ( is_search() && in_the_loop() ) {
-				$url = add_query_arg('s', urlencode(get_query_var('s')), $url);
+				$url = add_query_arg('hlst', urlencode(get_query_var('s')), $url);
 		}
 		return $url;
 	}
@@ -131,7 +132,10 @@ class HighlightSearchTerms {
 			foreach ($searches as $search) {
 				$filtered[] = esc_attr($search);
 			}
-		} elseif ( $search = get_query_var( 'bbp_search' ) ) { // bbPress search
+		} elseif ( $search = $_GET['hlst'] or $search = get_query_var( 'bbp_search' ) ) {
+			// Click-through from search results page or bbPress search
+			// Use $_GET here because adding 'hlst' to query_vars will mess with static front page display, showing blog instead
+			
 			// prepare js array
 			$filtered = self::split_search_terms($search);
 		} else { // conventional search (keep for pre 3.7 compat?)
