@@ -147,15 +147,13 @@ class HighlightSearchTerms {
 			// prepare js array
 			$filtered = self::split_search_terms($search);
 		} else { // conventional search (keep for pre 3.7 compat?)
-			$searches[] = get_search_query();
+			$search = get_search_query();
 			// prepare js array
 			if ( '1' == get_query_var( 'sentence' ) ) {
 				// treat it as a one sentence search, take only the first search term
-				$filtered[] = $searches[0];
+				$filtered[] = $search;
 			} else {
-				foreach ($searches as $search) {
-					$filtered = self::split_search_terms($search);
-				}
+				$filtered = self::split_search_terms($search);
 			}
 		}
 		
