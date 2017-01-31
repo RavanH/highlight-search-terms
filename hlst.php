@@ -56,7 +56,7 @@ class HighlightSearchTerms {
 	// followed by a '.' and then the class name to *improve script speed*.
 	static $areas = array(
 			'#groups-dir-list', '#members-dir-list', // BuddyPress compat
-			'li.bbp-body', // bbPress compat
+			'div.bbp-topic-content,div.bbp-reply-content,li.bbp-forum-info,.bbp-topic-title,.bbp-reply-title', // bbPress compat
 			'article',
 			'div.hentry',
 			'div.post',
@@ -99,12 +99,19 @@ class HighlightSearchTerms {
 			add_filter('post_link', array(__CLASS__,'append_search_query') );
 			add_filter('post_type_link', array(__CLASS__,'append_search_query') );
 			add_filter('page_link', array(__CLASS__,'append_search_query') );
-			// TODO do this for bbPress search result links
+			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 		}
+		// for bbPress search result links
+		if ( function_exists('bbp_is_search') && bbp_is_search() ) {
+			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
+			add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
+		}
+
 	}
 
 	public static function append_search_query( $url ) {
-		if ( in_the_loop() && self::have_search_terms() ) {
+		// do we need in_the_loop() check here ? (it breaks bbPress url support)
+		if ( self::have_search_terms() ) {
 			$url = add_query_arg('hilite', urlencode( implode(' ',self::$search_terms)), $url);
 		}
 		return $url;
