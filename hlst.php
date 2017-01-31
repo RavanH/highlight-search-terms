@@ -104,8 +104,7 @@ class HighlightSearchTerms {
 	}
 
 	public static function append_search_query( $url ) {
-		if ( in_the_loop() ) {
-			if ( !isset( self::$search_terms ) ) self::get_search_query();
+		if ( in_the_loop() && self::have_search_terms() ) {
 			$url = add_query_arg('hilite', urlencode( implode(' ',self::$search_terms)), $url);
 		}
 		return $url;
@@ -113,9 +112,9 @@ class HighlightSearchTerms {
 
 	public static function enqueue_script() {
 		if ( defined('WP_DEBUG') && true == WP_DEBUG )
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::get_version(), true);
+			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array(), self::get_version(), true);
 		else
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array('jquery'), self::get_version(), true);
+			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array(), self::get_version(), true);
 	}
 
 	public static function split_search_terms( $search ) {
@@ -130,44 +129,40 @@ class HighlightSearchTerms {
 		return $return;
 	}
 
-	private static function get_search_query() {
-		$filtered = array();
-		$searches = array();
-
-		// get terms
-		if ( $searches = get_query_var( 'search_terms' ) ) { // get regular parsed WP search terms
-			// prepare js array
-			foreach ($searches as $search) {
-				$filtered[] = esc_attr($search);
-			}
-		} elseif ( ( isset($_GET['hilite']) and $search = $_GET['hilite'] ) or $search = get_query_var( 'bbp_search' ) ) {
-			// Click-through from search results page or bbPress search
-			// Use $_GET here because adding 'hlst' to query_vars will mess with static front page display, showing blog instead
-
-			// prepare js array
-			$filtered = self::split_search_terms($search);
-		} else { // conventional search (keep for pre 3.7 compat?)
-			$search = get_search_query();
-			// prepare js array
-			if ( '1' == get_query_var( 'sentence' ) ) {
-				// treat it as a one sentence search, take only the first search term
-				$filtered[] = $search;
-			} else {
-				$filtered = self::split_search_terms($search);
-			}
-		}
+	private static function have_search_terms() {
+		// did we get search terms before?
+		if ( isset( self::$search_terms ) )
+			return empty( self::$search_terms ) ? false : true;
 		
-		self::$search_terms = $filtered;
+		// prepare js array
+		self::$search_terms = array();
+		
+		// check for click-through from search results page
+		if ( isset($_GET['hilite']) ) {
+			self::$search_terms = self::split_search_terms( $_GET['hilite'] );
+		} 
+		// try regular parsed WP search terms
+		elseif ( $searches = get_query_var( 'search_terms', false ) ) { 
+			foreach ( (array)$searches as $search ) {
+				self::$search_terms[] = esc_attr( $search );
+			}
+		} 
+		// try for bbPress search
+		elseif ( $search = get_query_var( 'bbp_search', false ) ) {		
+			self::$search_terms = self::split_search_terms( $search );
+		}
+						
+		return empty( self::$search_terms ) ? false : true;
 	}
 
 	// Get query variables and print footer script
 	public static function print_script() {
-		if ( !isset( self::$search_terms ) ) self::get_search_query();
+		$terms = self::have_search_terms() ? implode('","',self::$search_terms) : '';
 
 		echo '
 <!-- Highlight Search Terms ' . self::get_version() . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) -->
 <script type="text/javascript">
-var hlst_query = new Array("' . implode('","',self::$search_terms) . '");
+var hlst_query = new Array("' . $terms . '");
 var hlst_areas = new Array("' . implode('","',self::$areas) . '");
 </script>
 ';
