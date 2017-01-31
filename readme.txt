@@ -151,14 +151,14 @@ Use filtered search terms for click through highlighting.
 
 == Changelog ==
 
-= 1.5 =
+= 1.4.3 =
 
 Date 2017-01-31
 Dev time: 3h
 
 * BUGFIX: [] operator not supported for strings in PHP 7
-* Removed jQuery dependency
 * Drop pre WP 3.7 support
+* Better bbPress support 
 
 = 1.4.2 =
 
