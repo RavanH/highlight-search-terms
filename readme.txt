@@ -2,7 +2,7 @@
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ravanhagen%40gmail%2ecom&amp;item_name=Highlight%20Search%20Terms&amp;no_shipping=0&amp;tax=0&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8
 Tags: mark, highlight, hilite, search, term, terms, jquery
-Requires at least: 2.7
+Requires at least: 3.7
 Tested up to: 4.7
 Stable tag: 1.4.2
 
@@ -150,6 +150,15 @@ Please provide me with a bug report, suggestion, question on https://github.com/
 Use filtered search terms for click through highlighting.
 
 == Changelog ==
+
+= 1.5 =
+
+Date 2017-01-31
+Dev time: 3h
+
+* BUGFIX: [] operator not supported for strings in PHP 7
+* Removed jQuery dependency
+* Drop pre WP 3.7 support
 
 = 1.4.2 =
 
