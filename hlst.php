@@ -112,9 +112,9 @@ class HighlightSearchTerms {
 
 	public static function enqueue_script() {
 		if ( defined('WP_DEBUG') && true == WP_DEBUG )
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array(), self::get_version(), true);
+			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::get_version(), true);
 		else
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array(), self::get_version(), true);
+			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array('jquery'), self::get_version(), true);
 	}
 
 	public static function split_search_terms( $search ) {
