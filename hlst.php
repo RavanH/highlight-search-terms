@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&item_number=1%2e4&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.4.3
+Version: 1.4.4
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -44,7 +44,7 @@ class HighlightSearchTerms {
 	*/
 
 	// plugin version
-	private static $version = null;
+	private static $version = '1.4.4';
 
 	// filtered search terms
 	private static $search_terms = null;
@@ -75,14 +75,6 @@ class HighlightSearchTerms {
 	* Plugin functions
 	*/
 
-	public static function get_version() {
-		if ( null === self::$version ) { // "=== null" is twice as fast in PHP 5 while "is_null()" is slightly faster in PHP 7
-			$data = get_file_data( __FILE__ , array('Version' => 'Version') );
-			self::$version = isset($data['Version']) ? $data['Version'] : false;
-		}
-		return self::$version;
-	}
-
 	public static function init() {
 		// -- HOOKING INTO WP -- //
 		add_action( 'wp_enqueue_scripts', array(__CLASS__, 'enqueue_script') );
@@ -112,65 +104,61 @@ class HighlightSearchTerms {
 	public static function append_search_query( $url ) {
 		// do we need in_the_loop() check here ? (it breaks bbPress url support)
 		if ( self::have_search_terms() ) {
-			$url = add_query_arg('hilite', urlencode( implode(' ',self::$search_terms)), $url);
+			$url = add_query_arg('hilite', urlencode( '"' . implode('","',self::$search_terms) . '"' ), $url);
 		}
 		return $url;
 	}
 
 	public static function enqueue_script() {
 		if ( defined('WP_DEBUG') && true == WP_DEBUG )
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::get_version(), true);
+			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::$version, true);
 		else
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array('jquery'), self::get_version(), true);
+			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array('jquery'), self::$version, true);
 	}
 
 	public static function split_search_terms( $search ) {
 		$return = array();
-		if ( preg_match_all('/([^\s"\']+)|"([^"]*)"|\'([^\']*)\'/', stripslashes(urldecode($search)), $terms) ) {
+		if ( preg_match_all('/([^\s"\',\+]+)|"([^"]*)"|\'([^\']*)\'/', stripslashes(urldecode($search)), $terms) ) {
 			foreach($terms[0] as $term) {
-				$term = esc_attr(trim(str_replace(array('"','\'','%22'), '', $term)));
+				$term = trim(str_replace(array('"','\'','%22','%27'), '', $term));
 				if ( !empty($term) )
-					$return[] = esc_attr($term);
+					$return[] = $term;
 			}
 		}
 		return $return;
 	}
 
 	private static function have_search_terms() {
-		// did we get search terms before?
+		// did we look for search terms before?
 		if ( isset( self::$search_terms ) )
 			return empty( self::$search_terms ) ? false : true;
-		
+
 		// prepare js array
 		self::$search_terms = array();
-		
+
 		// check for click-through from search results page
-		if ( isset($_GET['hilite']) ) {
+		if ( isset($_GET['hilite']) )
 			self::$search_terms = self::split_search_terms( $_GET['hilite'] );
-		} 
 		// try regular parsed WP search terms
-		elseif ( $searches = get_query_var( 'search_terms', false ) ) { 
-			foreach ( (array)$searches as $search ) {
-				self::$search_terms[] = esc_attr( $search );
-			}
-		} 
+		elseif ( $searches = get_query_var( 'search_terms', false ) )
+				self::$search_terms = $searches;
 		// try for bbPress search
-		elseif ( $search = get_query_var( 'bbp_search', false ) ) {		
+		elseif ( $search = get_query_var( 'bbp_search', false ) )
 			self::$search_terms = self::split_search_terms( $search );
-		}
-						
+
 		return empty( self::$search_terms ) ? false : true;
 	}
 
 	// Get query variables and print footer script
 	public static function print_script() {
-		$terms = self::have_search_terms() ? implode('","',self::$search_terms) : '';
+		$terms = self::have_search_terms() ? wp_json_encode( (array) self::$search_terms ) : '[]';
+		$areas = wp_json_encode( (array) self::$areas);
 
 		echo '
-<!-- Highlight Search Terms ' . self::get_version() . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) -->
+<!-- Highlight Search Terms ' . self::$version . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) -->
 <script type="text/javascript">
-var hlst_query = new Array("' . $terms . '");
-var hlst_areas = new Array("' . implode('","',self::$areas) . '");
+var hlst_query = ' . $terms . ';
+var hlst_areas = ' . $areas . ';
 </script>
 ';
 	}
