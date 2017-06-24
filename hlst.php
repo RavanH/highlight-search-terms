@@ -104,7 +104,7 @@ class HighlightSearchTerms {
 	public static function append_search_query( $url ) {
 		// do we need in_the_loop() check here ? (it breaks bbPress url support)
 		if ( self::have_search_terms() ) {
-			$url = add_query_arg('hilite', urlencode( '"' . implode('","',self::$search_terms) . '"' ), $url);
+			$url = add_query_arg('hilite', urlencode( "'" . implode("','",self::$search_terms) . "'" ), $url);
 		}
 		return $url;
 	}
