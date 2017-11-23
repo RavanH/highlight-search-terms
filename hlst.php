@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&item_number=1%2e4&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.4.4
+Version: 1.4.5
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -93,8 +93,8 @@ class HighlightSearchTerms {
 			add_filter('page_link', array(__CLASS__,'append_search_query') );
 			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 		}
-		// for bbPress search result links
-		if ( function_exists('bbp_is_search') && bbp_is_search() ) {
+		// for bbPress search result links, but prevent bbp_is_search on admin triggered by Gravity Forms
+		if ( function_exists('bbp_is_search') && !is_admin() && bbp_is_search() ) {
 			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 			add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
 		}
