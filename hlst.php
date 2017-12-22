@@ -138,7 +138,7 @@ class HighlightSearchTerms {
 			if ( $searches = get_query_var( 'search_terms', false ) )
 				self::$search_terms = $searches;
 			// try for bbPress search or click-through from WP search results page
-			elseif ( $search = get_query_var( 'bbp_search', false ) || ( isset($_GET['hilite']) &&  $search = $_GET['hilite'] ) )
+			elseif ( $search = get_query_var( 'bbp_search', false ) OR ( isset($_GET['hilite']) AND $search = $_GET['hilite'] ) )
 				self::$search_terms = self::split_search_terms( $search );
 
 			// nothing? then just leave empty array
