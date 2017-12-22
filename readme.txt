@@ -150,7 +150,7 @@ Fix possible XSS vulnerability in append_search_query().
 
 Date 2017-12-22
 
-* Fix possible vulnerability in append_search_query().
+* Fix possible vulnerability in append_search_query()
 
 = 1.4.5 =
 

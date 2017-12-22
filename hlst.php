@@ -93,8 +93,8 @@ class HighlightSearchTerms {
 			add_filter('page_link', array(__CLASS__,'append_search_query') );
 			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 		}
-		// for bbPress search result links
-		if ( function_exists('bbp_is_search') && bbp_is_search() ) {
+		// for bbPress search result links, but prevent bbp_is_search on admin triggered by Gravity Forms
+		if ( function_exists('bbp_is_search') && !is_admin() && bbp_is_search() ) {
 			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 			add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
 		}
@@ -104,7 +104,7 @@ class HighlightSearchTerms {
 	public static function append_search_query( $url ) {
 		// do we need in_the_loop() check here ? (it breaks bbPress url support)
 		if ( self::have_search_terms() ) {
-			$url = add_query_arg('hilite', urlencode( '"' . implode('","',self::$search_terms) . '"' ), $url);
+			$url = add_query_arg('hilite', urlencode( "'" . implode("','",self::$search_terms) . "'" ), $url);
 		}
 		return esc_url( $url );
 	}
