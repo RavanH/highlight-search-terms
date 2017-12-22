@@ -3,7 +3,7 @@ Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ravanhagen%40gmail%2ecom&amp;item_name=Highlight%20Search%20Terms&amp;no_shipping=0&amp;tax=0&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8
 Tags: mark, highlight, hilite, search, term, terms, jquery
 Requires at least: 3.7
-Tested up to: 4.7
+Tested up to: 4.9
 Stable tag: 1.4.6
 
 Very lightweight jQuery script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
@@ -77,9 +77,9 @@ Sure! See tab [Other Notes](http://wordpress.org/extend/plugins/highlight-search
 
 Due to a problem with jQuery's `$('body')` call in combination with many other scripts (like Google Ads, Analytics, Skype Check and other javascript) in the ever increasingly popular Firefox browser, I have had to limit the script search term wrapping to a particular div instead of the whole document body. I chose div with class "hentry" since that is the most commonly used content layer class in WordPress themes. If that is not available, the script will look for divs #content then #main then #wrapper. However, in your particular theme, none of these divs might be available...
 
-Let's suppose your theme's index.php or single.php has no `<div <?php post_class() ?> ... >` but wraps the post/page content in a `<div id="common" class="content"> ... </div>`. You can do two things to solve this:
+Let's suppose your theme's index.php or single.php has no `<div <?php post_class() ?> ... >` but wraps the post/page content in a `<div id="common" class="content"> ... </div>`. You can do one of three things to solve this:
 
-A. Change your theme and stylesheet so the post/page content div has either `class="hentry"` or `<?php post_class() ?>`. TIP: Take a look at how it is done in the Default theme included in each WordPress release. But this might involve some real timeconsuming tinkering with your stylesheet and several theme template files.
+A. Change your theme templates like single.php, page.pho and search.php so the post/page content div has a class "hentry" (you can append it to existing classes with a space like `class="content hentry"`).
 
 B. Change the source of wp-content/plugins/highlight-search-terms/hlst.php so that the array starting on line 55 contains your main content ID or class name. In the above example that can be either `'#common',` or `'.content',` where a prefix '#' is used for ID and '.' for class.
 
@@ -135,9 +135,9 @@ Keep in mind that for the _first_ search term the additional class "term-0" is u
 
 1. If your theme does not wrap the main content section of your pages in a div with class "hentry" or HTML5 article tags, this plugin might not work for you out of the box. However, you can _make_ it work. See the last of the [FAQ's](http://wordpress.org/extend/plugins/highlight-search-terms/faq/) for an explanation.
 
-2. [Josh](http://theveganpost.com) pointed out a conflict with the [ShareThis button](http://sharethis.com/wordpress). I have no clue why this happens but since version 0.5 jQuery is used in so called NoConflict mode. Please let me know if the problem still exists. Thanks!
+2. [Josh](http://theveganpost.com) pointed out a conflict with the ShareThis buttons plugin. Since then, that plugin has been completely rewriten so please let me know if the problem still exists. Thanks!
 
-3. When search engine referrer is using SSL (notice the https:// in the URL, usually when logged in as Google user) then the search terms cannot be determined. There is no way to get around that issue.
+3. When search engine referrer is using SSL (notice the https:// in the URL) then the search terms cannot be determined. Most search engines are always over SSL nowadays. There is no way to get around that issue.
 
 Thank you, [Jason](http://wordpress.org/support/profile/412612) for pointing out a bug for IE7+, fixed in 0.2.
 
