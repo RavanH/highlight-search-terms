@@ -10,3 +10,5 @@ Highlights search terms using jQuery when referer is a search engine _or_ within
 - Click through highlights: Highlights not only on WP search results page but also one click deeper inside any of the found pages
 - Search terms wrapped in double qoutes now considered as single term
 - Support for many more search engines: Google, Bing, Yahoo, Lycos, Ask, AOL, Baidu, Youdao, Dogpile, Search.com, Goodsearch.com, Mywebsearch.com, Webcrawler.com, Info.com
+
+Read more on https://wordpress.org/plugins/highlight-search-terms/
