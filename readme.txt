@@ -145,17 +145,23 @@ Please provide me with a bug report, suggestion, question on https://github.com/
 
 == Upgrade Notice ==
 
-= 1.4.5 =
+= 1.4.6 =
 
 Fix possible XSS vulnerability in append_search_query().
 
 == Changelog ==
 
-= 1.4.5 =
+= 1.4.6 =
 
 Date 2017-12-22
 
 * Fix possible vulnerability in append_search_query().
+
+= 1.4.5 =
+
+Date 2017-11-23
+
+* FIX: Prevent bbp_is_search() on admin triggered by Gravity Forms, reported by @dicoeenvoud
 
 = 1.4.4 =
 
