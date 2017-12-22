@@ -84,6 +84,13 @@ class HighlightSearchTerms {
 
 		// append search query string to results permalinks
 		add_action( 'parse_query', array(__CLASS__,'add_url_filters') );
+
+		//
+		add_action('plugins_loaded', array(__CLASS__, 'load_textdomain'));
+	}
+
+	public static function load_textdomain() {
+		load_plugin_textdomain( 'highlight-search-terms' );
 	}
 
 	public static function add_url_filters() {
