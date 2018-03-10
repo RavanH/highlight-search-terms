@@ -20,11 +20,11 @@ This is done by going without any back-end options page, no filtering of post co
 
 **Features**
 
+- Click through highlights: Highlights not only on WP search results page but also one click deeper inside any of the found pages
+- Character and case insensitive (lenient) highlighting
 - BuddyPress / bbPress compatibility: highlighting within forum searches
 - Caching (WP Super Cache) compatibility
-- Click through highlights: Highlights not only on WP search results page but also one click deeper inside any of the found pages
 - Search terms wrapped in double quotes now considered as single term
-- Support for many more search engines: Google, Bing, Yahoo, Lycos, Ask, AOL, Baidu, Youdao, Dogpile, Search.com, Goodsearch.com, Mywebsearch.com, Webcrawler.com, Info.com
 
 = What does it do? =
 
