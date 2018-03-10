@@ -3,13 +3,13 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&item_number=1%2e4&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.4.7
+Version: 1.5
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
 */
 
-/*  Copyright 2017  RavanH  (email : ravanhagen@gmail.com)
+/*  Copyright 2018  RavanH  (email : ravanhagen@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class HighlightSearchTerms {
 	*/
 
 	// plugin version
-	private static $version = '1.4.7';
+	private static $version = '1.5';
 
 	// filtered search terms
 	private static $search_terms = null;
@@ -80,14 +80,14 @@ class HighlightSearchTerms {
 		add_action( 'wp_enqueue_scripts', array(__CLASS__, 'enqueue_script') );
 
 		// Set query string as js variable in footer
-		add_action( 'wp_footer', array(__CLASS__, 'print_script') );
+		//add_action( 'wp_footer', array(__CLASS__, 'print_script') );
 
 		// append search query string to results permalinks
 		add_action( 'parse_query', array(__CLASS__,'add_url_filters') );
 
 		// text domain
-		if ( is_admin() )
-			add_action('plugins_loaded', array(__CLASS__, 'load_textdomain'));
+		//if ( is_admin() )
+		//	add_action('plugins_loaded', array(__CLASS__, 'load_textdomain'));
 	}
 
 	public static function load_textdomain() {
@@ -119,9 +119,15 @@ class HighlightSearchTerms {
 
 	public static function enqueue_script() {
 		if ( defined('WP_DEBUG') && true == WP_DEBUG )
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::$version, true);
+			wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::$version, true );
 		else
-			wp_enqueue_script('hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array('jquery'), self::$version, true);
+			wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array('jquery'), self::$version, true );
+
+		$script =  '/* Highlight Search Terms ' . self::$version . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . PHP_EOL;
+		$script .= 'var hlst_query = ';
+		$script .= self::have_search_terms() ? wp_json_encode( (array) self::$search_terms ) : '[]';
+		$script .= '; var hlst_areas = ' . wp_json_encode( (array) self::$areas) . ';';
+		wp_add_inline_script( 'hlst-extend', $script, 'before' );
 	}
 
 	public static function split_search_terms( $search ) {
@@ -139,36 +145,19 @@ class HighlightSearchTerms {
 	private static function have_search_terms() {
 		// did we not look for search terms before?
 		if ( !isset( self::$search_terms ) ) {
-			// prepare js array
-			self::$search_terms = array();
-
 			// try regular parsed WP search terms
 			if ( $searches = get_query_var( 'search_terms', false ) )
 				self::$search_terms = $searches;
 			// try for bbPress search or click-through from WP search results page
 			elseif ( $search = get_query_var( 'bbp_search', false ) OR ( isset($_GET['hilite']) AND $search = $_GET['hilite'] ) )
 				self::$search_terms = self::split_search_terms( $search );
-
 			// nothing? then just leave empty array
+			else
+				self::$search_terms = array();
 		}
 
 		return empty( self::$search_terms ) ? false : true;
 	}
-
-	// Get query variables and print footer script
-	public static function print_script() {
-		$terms = self::have_search_terms() ? wp_json_encode( (array) self::$search_terms ) : '[]';
-		$areas = wp_json_encode( (array) self::$areas);
-
-		echo '
-<!-- Highlight Search Terms ' . self::$version . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) -->
-<script type="text/javascript">
-var hlst_query = ' . $terms . ';
-var hlst_areas = ' . $areas . ';
-</script>
-';
-	}
-
 }
 
 HighlightSearchTerms::init();

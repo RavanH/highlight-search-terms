@@ -4,16 +4,16 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=r
 Tags: mark, highlight, hilite, search, term, terms, jquery
 Requires at least: 3.7
 Tested up to: 4.9
-Stable tag: 1.4.7
+Stable tag: 1.5
 
 Very lightweight jQuery script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
 
 
 == Description ==
 
-Highlights search using jQuery terms within WordPress generated search results _or_ when referrer is a non-secure search engine. This plugin is light weight and has no options.
-It started as very simple fusion between <a href="http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/">How to Highlight Search Terms with jQuery - theme hack by Thaya Kareeson</a> and <a href="http://wordpress.org/extend/plugins/google-highlight/">Search Hilite by Ryan Boren</a>.
-It has since evolved with many optimizations, HTML5 and bbPress support.
+Highlights search terms within WordPress generated search results _or_ when referrer is a non-secure search engine, both on the search results page _and_ on the post page itself.
+
+This plugin is light weight and has no options. It started as very simple fusion between <a href="http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/">How to Highlight Search Terms with jQuery - theme hack by Thaya Kareeson</a> and <a href="http://wordpress.org/extend/plugins/google-highlight/">Search Hilite by Ryan Boren</a>. It has since evolved with many optimizations, HTML5 and bbPress support.
 
 Many WordPress sites are already top-heavy with all kinds of resource hungry plugins that require a lot of options to be set and subsequently more database queries. The Highlight Search Terms plugin for WordPress is constructed to be as low impact / low resource demanding as possible, keeping server response and page load times low.
 This is done by going without any back-end options page, no filtering of post content and no extra database entries. A limited amount of hooks are used. The rest is done by jQuery javascript extention and your own CSS.
@@ -140,11 +140,18 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Upgrade Notice ==
 
-= 1.4.7 =
+= 1.5 =
 
-Fix possible XSS vulnerability in append_search_query() and add textdomain.
+* Accent insensitive highlighting
+* Move to wp_add_inline_script.
 
 == Changelog ==
+
+= 1.5 =
+
+Date 2018-03-10
+
+* Move to wp_add_inline_script
 
 = 1.4.7 =
 
