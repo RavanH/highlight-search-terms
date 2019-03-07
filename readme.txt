@@ -142,7 +142,7 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 = 1.5.2 =
 
-FIX: cyrillic case sensitive results
+FIX: cyrillic case sensitive results, thanks @dimmez
 
 == Changelog ==
 
@@ -150,7 +150,7 @@ FIX: cyrillic case sensitive results
 
 Date 2019-03-07
 
-* FIX: cyrillic case sensitive results
+* FIX: cyrillic case sensitive results, thanks @dimmez
 * Script compression
 
 = 1.5 =
