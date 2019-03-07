@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=r
 Tags: mark, highlight, hilite, search, term, terms, jquery
 Requires at least: 3.7
 Tested up to: 5.1
-Stable tag: 1.5
+Stable tag: 1.5.1
 
 Very lightweight jQuery script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
 
@@ -140,12 +140,17 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Upgrade Notice ==
 
-= 1.5 =
+= 1.5.1 =
 
-* Accent insensitive highlighting
-* Move to wp_add_inline_script.
+FIX: cyrillic case sensitive results
 
 == Changelog ==
+
+= 1.5.1 =
+
+Date 2019-03-07
+
+* FIX: cyrillic case sensitive results
 
 = 1.5 =
 
