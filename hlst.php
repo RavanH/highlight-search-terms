@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&item_number=1%2e4&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.5.2
+Version: 1.5.3
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -44,7 +44,7 @@ class HighlightSearchTerms {
 	*/
 
 	// plugin version
-	private static $version = '1.5';
+	private static $version = '1.5.3';
 
 	// filtered search terms
 	private static $search_terms = null;
@@ -77,13 +77,12 @@ class HighlightSearchTerms {
 
 	public static function init() {
 		// -- HOOKING INTO WP -- //
-		add_action( 'wp_enqueue_scripts', array(__CLASS__, 'enqueue_script') );
-
-		// Set query string as js variable in footer
-		//add_action( 'wp_footer', array(__CLASS__, 'print_script') );
-
 		// append search query string to results permalinks
-		add_action( 'parse_query', array(__CLASS__,'add_url_filters') );
+		// wp is the earliest hook where get_query_var('search_terms') will return results
+		add_action( 'wp', array(__CLASS__,'add_url_filters') );
+
+		// enqueue main script
+		add_action( 'wp_enqueue_scripts', array(__CLASS__, 'enqueue_script') );
 
 		// text domain
 		//if ( is_admin() )
@@ -95,14 +94,11 @@ class HighlightSearchTerms {
 	}
 
 	public static function add_url_filters() {
-		if ( is_search() ) {
+		if ( !is_admin() && self::have_search_terms() ) {
 			add_filter('post_link', array(__CLASS__,'append_search_query') );
 			add_filter('post_type_link', array(__CLASS__,'append_search_query') );
 			add_filter('page_link', array(__CLASS__,'append_search_query') );
-			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
-		}
-		// for bbPress search result links, but prevent bbp_is_search on admin triggered by Gravity Forms
-		if ( function_exists('bbp_is_search') && !is_admin() && bbp_is_search() ) {
+			// for bbPress search result links
 			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 			add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
 		}
@@ -118,6 +114,9 @@ class HighlightSearchTerms {
 	}
 
 	public static function enqueue_script() {
+		// abort if no search the_terms
+		if ( ! self::have_search_terms() ) return;
+
 		if ( defined('WP_DEBUG') && true == WP_DEBUG )
 			wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend.js', __FILE__), array('jquery'), self::$version, true );
 		else
@@ -125,7 +124,7 @@ class HighlightSearchTerms {
 
 		$script =  '/* Highlight Search Terms ' . self::$version . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . PHP_EOL;
 		$script .= 'var hlst_query = ';
-		$script .= self::have_search_terms() ? wp_json_encode( (array) self::$search_terms ) : '[]';
+		$script .= wp_json_encode( (array) self::$search_terms );
 		$script .= '; var hlst_areas = ' . wp_json_encode( (array) self::$areas) . ';';
 		wp_add_inline_script( 'hlst-extend', $script, 'before' );
 	}
