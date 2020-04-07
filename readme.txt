@@ -140,11 +140,17 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Upgrade Notice ==
 
-= 1.5.4 =
+= 1.5.5 =
 
-Prevent click-through search highlighting from menu items or widgets
+Security bug fix release.
 
 == Changelog ==
+
+= 1.5.5 =
+
+Date 2020-04-07
+
+* FIX: XSS vulnerability revisited
 
 = 1.5.4 =
 
