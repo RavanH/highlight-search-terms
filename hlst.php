@@ -100,6 +100,8 @@ class HighlightSearchTerms {
 			// for bbPress search result links
 			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
 			add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
+			// permalink
+			add_filter( 'the_permalink', array(__CLASS__,'append_search_query_permalink') , 10, 2 );
 		}
 
 	}
@@ -112,6 +114,13 @@ class HighlightSearchTerms {
 		return $url;
 	}
 
+	public static function append_search_query_permalink( $url, $post ) {
+		if ( !strpos( $url, 'hilite=' ) ) {
+			$url = self::append_search_query( $url );
+		}
+		return $url;
+	}
+	
 	public static function enqueue_script() {
 		// abort if no search the_terms
 		if ( ! self::have_search_terms() ) return;
