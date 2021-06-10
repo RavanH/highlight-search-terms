@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: Highlight Search Terms
-Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
+Plugin URI: https://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.5.7
+Version: 1.5.5
 Author: RavanH
-Author URI: http://status301.net/
+Author URI: https://status301.net/
 Text Domain: highlight-search-terms
 */
 
-/*  Copyright 2021  RavanH  (email : ravanhagen@gmail.com)
+/*  Copyright 2020  RavanH  (email : ravanhagen@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class HighlightSearchTerms {
 	*/
 
 	// plugin version
-	private static $version = '1.5.6';
+	private static $version = '1.5.3';
 
 	// filtered search terms
 	private static $search_terms = null;
@@ -93,27 +93,27 @@ class HighlightSearchTerms {
 	}
 
 	public static function add_url_filters() {
-		if ( is_admin() || ! self::have_search_terms() || ! is_search() || ( function_exists('bbp_is_search') && ! bbp_is_search() ) ) {
-			return;
+		if ( !is_admin() && self::have_search_terms() ) {
+			add_filter('post_link', array(__CLASS__,'append_search_query') );
+			add_filter('post_type_link', array(__CLASS__,'append_search_query') );
+			add_filter('page_link', array(__CLASS__,'append_search_query') );
+			// for bbPress search result links
+			add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
+			add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
 		}
-		add_filter('post_link', array(__CLASS__,'append_search_query') );
-		add_filter('post_type_link', array(__CLASS__,'append_search_query') );
-		add_filter('page_link', array(__CLASS__,'append_search_query') );
-		// for bbPress search result links.
-		add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
-		add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
+
 	}
 
 	public static function append_search_query( $url ) {
 		// we need in_the_loop() check here to prevent apending query to menu links. But it breaks bbPress url support...
-		if ( in_the_loop() ) {
-			$url = add_query_arg( 'hilite', urlencode( "'" . implode( "','", self::$search_terms) . "'" ), $url );
+		if ( in_the_loop() && self::have_search_terms() ) {
+			$url = add_query_arg('hilite', urlencode( "'" . implode("','",self::$search_terms) . "'" ), $url);
 		}
 		return $url;
 	}
 
 	public static function enqueue_script() {
-		// abort if no search terms.
+		// abort if no search the_terms
 		if ( ! self::have_search_terms() ) return;
 
 		if ( defined('WP_DEBUG') && true == WP_DEBUG )
@@ -154,13 +154,13 @@ class HighlightSearchTerms {
 	private static function have_search_terms() {
 		// did we not look for search terms before?
 		if ( !isset( self::$search_terms ) ) {
-			// try regular parsed WP search terms.
+			// try regular parsed WP search terms
 			if ( $searches = get_query_var( 'search_terms', false ) )
 				self::$search_terms = self::sanitize_terms( $searches );
-			// try for bbPress search or click-through from WP search results page.
+			// try for bbPress search or click-through from WP search results page
 			elseif ( $search = get_query_var( 'bbp_search', false ) OR ( isset($_GET['hilite']) AND $search = $_GET['hilite'] ) )
 				self::$search_terms = self::split_search_terms( $search );
-			// nothing? then just leave empty array.
+			// nothing? then just leave empty array
 			else
 				self::$search_terms = array();
 		}
