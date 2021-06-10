@@ -124,7 +124,7 @@
 		}
 
 		var area, i, s;
-		var t = jQuery.support.opacity ? 'mark' : 'span';
+		var t = 'mark';
 		/*
 		 * Accented character map from ftp.unicode.org/Public/UNIDATA/UnicodeData.txt.
 		 * Maps each upper-case basic alphabet character in the A-Z range to a regex
