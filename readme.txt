@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=r
 Tags: mark, highlight, hilite, search, term, terms, jquery
 Requires at least: 3.7
 Tested up to: 5.7
-Stable tag: 1.5.6
+Stable tag: 1.5.8
 
 Very lightweight jQuery script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
 
@@ -152,6 +152,12 @@ Date
 
 * Jetpack Infinite Scroll and FacetWP compatibility
 * Vanilla Javascript, no more jQuery dependency!
+
+= 1.5.8 =
+
+Date 2021-06-20
+
+* NEW: filters hlst_query_vars and hlst_input_get_args
 
 = 1.5.7 =
 

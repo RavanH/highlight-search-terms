@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Highlight Search Terms
-Plugin URI: https://status301.net/wordpress-plugins/highlight-search-terms
+Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
 Version: 1.6-alpha-1
 Author: RavanH
-Author URI: https://status301.net/
+Author URI: http://status301.net/
 Text Domain: highlight-search-terms
 */
 
@@ -48,6 +48,9 @@ class HighlightSearchTerms {
 	// filtered search terms
 	private static $search_terms = null;
 
+	// filtered hilite terms
+	private static $hilite_terms = null;
+
 	// Change or extend this to match themes content div ID or classes.
 	// The hilite script will test div ids/classes and use the first one it finds.
 	// When referencing an *ID name*, just be sure to begin with a '#'.
@@ -77,11 +80,11 @@ class HighlightSearchTerms {
 	public static function init() {
 		// -- HOOKING INTO WP -- //
 		// append search query string to results permalinks
-		// wp is the earliest hook where get_query_var('search_terms') will return results.
-		add_action( 'wp', array(__CLASS__,'add_url_filters') );
+		// wp is the earliest hook where get_query_var('search_terms') will return results
+		add_action( 'wp', array( __CLASS__, 'add_url_filters' ) );
 
 		// enqueue main script
-		add_action( 'wp_enqueue_scripts', array(__CLASS__, 'enqueue_script') );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
 
 		// text domain
 		//if ( is_admin() )
@@ -93,34 +96,31 @@ class HighlightSearchTerms {
 	}
 
 	public static function add_url_filters() {
-		if ( is_admin() || ! self::have_search_terms() || ! is_search() || ( function_exists('bbp_is_search') && ! bbp_is_search() ) ) {
-			return;
-		}
-		// TODO: test bbpress search https://codex.bbpress.org/bbpress-conditional-tags/.
-		add_filter('post_link', array(__CLASS__,'append_search_query') );
-		add_filter('post_type_link', array(__CLASS__,'append_search_query') );
-		add_filter('page_link', array(__CLASS__,'append_search_query') );
+		// abort if admin or singular or no search terms.
+		if ( is_admin() || ! self::have_search_terms() ) return;
+
+		add_filter( 'post_link', array( __CLASS__, 'append_search_query' ) );
+		add_filter( 'post_type_link', array( __CLASS__, 'append_search_query' ) );
+		add_filter( 'page_link', array( __CLASS__, 'append_search_query' ) );
 		// for bbPress search result links.
-		add_filter('bbp_get_topic_permalink', array(__CLASS__,'append_search_query') );
-		add_filter('bbp_get_reply_url', array(__CLASS__,'append_search_query') );
+		add_filter( 'bbp_get_topic_permalink', array( __CLASS__, 'append_search_query' ) );
+		add_filter( 'bbp_get_reply_url', array( __CLASS__, 'append_search_query' ) );
 	}
 
 	public static function append_search_query( $url ) {
 		// we need in_the_loop() check here to prevent apending query to menu links. But it breaks bbPress url support...
-		if ( in_the_loop() && self::have_search_terms() ) {
-			$url = add_query_arg( 'hilite', urlencode( "'" . implode( "','", self::$search_terms ) . "'" ), $url );
+		if ( in_the_loop() ) {
+			$url = add_query_arg( 'hilite', urlencode( "'" . implode( "','", self::get_search_terms() ) . "'" ), $url );
 		}
+
 		return $url;
 	}
 
 	public static function enqueue_script() {
 		// abort if no search the_terms.
-		if ( ! self::have_search_terms() ) return;
+		if ( ! self::have_search_terms() && ! self::have_hilite_terms() ) return;
 
-		if ( defined('WP_DEBUG') && true == WP_DEBUG )
-			wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend.js', __FILE__), array(), self::$version, true );
-		else
-			wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend.min.js', __FILE__), array(), self::$version, true );
+		wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__), array('jquery'), self::$version, true );
 
 		$terms = wp_json_encode( (array) self::$search_terms );
 		$areas = wp_json_encode( (array) self::$areas);
@@ -131,44 +131,82 @@ class HighlightSearchTerms {
 		wp_add_inline_script( 'hlst-extend', $script );
 	}
 
-	public static function sanitize_terms( $search ) {
-		$sanitized = array();
+	private static function split_search_terms( $search ) {
+		if ( is_array( $search ) ) return $search;
 
-		foreach( $search as $term ) {
-			$sanitized[] = wp_strip_all_tags( $term );
-		}
-
-		return $sanitized;
-	}
-
-	public static function split_search_terms( $search ) {
 		$return = array();
 
 		if ( preg_match_all( '/([^\s"\',\+]+)|"([^"]*)"|\'([^\']*)\'/', stripslashes( urldecode( $search ) ), $terms ) ) {
 			foreach( $terms[0] as $term ) {
 				$term = trim( str_replace( array( '"','\'','%22','%27' ), '', $term ) );
 				if ( !empty($term) )
-					$return[] = wp_strip_all_tags( $term );
+					$return[] = $term;
 			}
 		}
+
 		return $return;
 	}
 
-	private static function have_search_terms() {
-		// did we not look for search terms before?
-		if ( !isset( self::$search_terms ) ) {
-			// try regular parsed WP search terms.
-			if ( $searches = get_query_var( 'search_terms', false ) )
-				self::$search_terms = self::sanitize_terms( $searches );
-			// try for bbPress search or click-through from WP search results page.
-			elseif ( $search = get_query_var( 'bbp_search', false ) OR ( isset($_GET['hilite']) AND $search = $_GET['hilite'] ) )
+	private static function try_search_terms() {
+		// try know query vars.
+		$query_vars = apply_filters( 'hlst_query_vars', array( 'search_terms', 'bbp_search' ) );
+		foreach ( (array) $query_vars as $qvar ) {
+			$search = get_query_var( $qvar, false );
+			if ( $search ) {
 				self::$search_terms = self::split_search_terms( $search );
-			// nothing? then just leave empty array.
-			else
-				self::$search_terms = array();
+				return;
+			}
+		}
+		// try known get parameters.
+		$input_get_args = apply_filters( 'hlst_input_get_args', array() );
+		if ( ! empty( $input_get_args ) ) {
+			$inputs = filter_input_array( INPUT_GET, (array) $input_get_args, false );
+			if ( is_array( $inputs ) ) {
+				foreach ( $inputs as $qvar => $qval ) {
+					if ( ! empty( $qval ) ) {
+						self::$search_terms = self::split_search_terms( $qval );
+						return;
+					}
+				}
+			}	
+		}
+		// otherwise set empty array.
+		self::$search_terms = array();
+	}
+
+	private static function get_search_terms() {
+		// did we not look for search terms before?
+		if ( ! isset( self::$search_terms ) ) {
+			self::try_search_terms();
 		}
 
-		return empty( self::$search_terms ) ? false : true;
+		return self::$search_terms;
+	}
+
+	private static function have_search_terms() {
+		return ! empty( self::get_search_terms() );
+	}
+
+	private static function get_hilite_terms() {
+		// did we not look for hilite terms before?
+		if ( ! isset( self::$hilite_terms ) ) {
+			// try hilite get parameter
+			$input = filter_input( INPUT_GET, 'hilite', FILTER_SANITIZE_ENCODED );
+			if ( ! empty( $input ) ) {
+				self::$hilite_terms = self::split_search_terms( $input );
+			} else {
+				self::$hilite_terms = array();
+			}
+		}
+		return self::$hilite_terms;
+	}
+
+	private static function have_hilite_terms() {
+		return ! empty( self::get_hilite_terms() );
+	}
+
+	private static function get_terms() {
+		return array_merge( self::get_search_terms(), self::get_hilite_terms() );
 	}
 }
 
