@@ -56,7 +56,7 @@ class HighlightSearchTerms {
 	// When referencing an *ID name*, just be sure to begin with a '#'.
 	// When referencing a *class name*, try to put the tag in front,
 	// followed by a '.' and then the class name to *improve script speed*.
-	static $areas = array(
+	static $selectors = array(
 		'#groups-dir-list', '#members-dir-list', // BuddyPress compat
 		'div.bbp-topic-content,div.bbp-reply-content,li.bbp-forum-info,.bbp-topic-title,.bbp-reply-title', // bbPress compat
 		'article',
@@ -123,10 +123,13 @@ class HighlightSearchTerms {
 		wp_enqueue_script( 'hlst-extend', plugins_url( 'hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ), array(), self::$version, true );
 
 		$terms = wp_json_encode( (array) self::get_terms() );
-		$areas = wp_json_encode( (array) self::$areas);
+		$selectors = wp_json_encode( (array) apply_filters( 'hlst_selectors', self::$selectors ) );
 
 		$script = '/* Highlight Search Terms '.self::$version.' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . PHP_EOL;
-		$script .= "window.addEventListener('DOMContentLoaded',function(){window.hilite({$terms},{$areas},true,true)});";
+		$script .= "const hlst = function(){window.hilite({$terms},{$selectors},true,true)};" . PHP_EOL;
+		$script .= "window.addEventListener('DOMContentLoaded',hlst);window.addEventListener('post-load',hlst);";
+
+		$script = apply_filters( 'hlst_inline_script', $script );
 		wp_add_inline_script( 'hlst-extend', $script );
 	}
 
