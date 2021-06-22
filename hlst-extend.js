@@ -89,7 +89,7 @@
 	 */
 	_deaccent = function( accentedString ) {
 		var result = accentedString;
-		for ( var key in charToAccentedCharClassMap ) {
+		for ( let key in charToAccentedCharClassMap ) {
 			result = result.replace(new RegExp(charToAccentedCharClassMap[key], "g"), key);
 		}
 		return result;
@@ -190,13 +190,13 @@
 
 			parms = ref[1].split('&');
 
-			for ( var i=0; i < parms.length; i++ ) {
-				var pos = parms[i].indexOf('=');
+			for ( let i=0; i < parms.length; i++ ) {
+				let pos = parms[i].indexOf('=');
 				if ( pos > 0 ) {
 					if( q == parms[i].substring( 0, pos ) ) {
 						qstr = decodeURIComponent( (parms[i].substring( pos+1 ) + '' ).replace(/\+/g, '%20' ) );
 						qarr = qstr.match( /([^\s"]+)|"([^"]*)"/g ) || [];
-						for ( var j=0; j < qarr.length; j++ ){
+						for ( let j=0; j < qarr.length; j++ ){
 							ref_terms[j] = qarr[j].replace( /"/g, '' );
 						}
 						break;
