@@ -127,6 +127,9 @@
 		return result;
 	}
 
+	/**
+	 * Iterate through sibling and child nodes, searching and marking terms
+	 */
 	_mark = function( node, regex, classname, deep ) {
 		if ( !node || typeof node == 'undefined' ) {
 			return;
@@ -174,6 +177,50 @@
 	}
 		
 	/**
+	 * Try to catch terms from referrer search engine.
+	 * 
+	 * Fallback only used when script is included and window.hilite
+	 * is called without search terms. And even then, it only will 
+	 * find referrer search terms if referrer was on http...
+	 */
+	_get_referrer_terms = function() {
+		var ref_terms = [],
+			ref = document.referrer.split('?'),
+			parms, q = 'q';
+
+		// no query string found? then return false
+		if ( typeof ref[1] == 'undefined' ) return ref_terms;
+
+		if ( ref[0].indexOf('yahoo.com') > -1 ) {
+			q = 'p';
+		} else if ( ref[0].indexOf('goodsearch.com') > -1 ) {
+			q = 'keywords';
+		} else if ( ref[0].indexOf('mywebsearch.com') > -1 ) {
+			q = 'searchfor';
+		} else if ( ref[0].indexOf('baidu.') > -1 ) {
+			q = 'wd';
+		}
+
+		parms = ref[1].split('&');
+
+		for ( let i=0; i < parms.length; i++ ) {
+			let pos = parms[i].indexOf('=');
+			if ( pos > 0 ) {
+				if( q == parms[i].substring( 0, pos ) ) {
+					let qstr = decodeURIComponent( (parms[i].substring( pos+1 ) + '' ).replace(/\+/g, '%20' ) );
+					let qarr = qstr.match( /([^\s"]+)|"([^"]*)"/g ) || [];
+					for ( let j=0; j < qarr.length; j++ ){
+						ref_terms[j] = qarr[j].replace( /"/g, '' );
+					}
+					break;
+				}
+			}
+		}
+
+		return ref_terms;
+	}
+
+	/**
 	 * PUBLIC METHODS
 	 */
 
@@ -200,60 +247,20 @@
 			deep = arguments[3] || false;
 
 		/**
-		 * Try to catch terms from referrer search engine
-		 */
-		_get_referrer_terms = function() {
-			var ref_terms = [],
-				ref = document.referrer.split('?'),
-				parms, q = 'q';
-
-			// no query string found? then return false
-			if ( typeof ref[1] == 'undefined' ) return ref_terms;
-
-			if ( ref[0].indexOf('yahoo.com') > -1 ) {
-				q = 'p';
-			} else if ( ref[0].indexOf('goodsearch.com') > -1 ) {
-				q = 'keywords';
-			} else if ( ref[0].indexOf('mywebsearch.com') > -1 ) {
-				q = 'searchfor';
-			} else if ( ref[0].indexOf('baidu.') > -1 ) {
-				q = 'wd';
-			}
-
-			parms = ref[1].split('&');
-
-			for ( let i=0; i < parms.length; i++ ) {
-				let pos = parms[i].indexOf('=');
-				if ( pos > 0 ) {
-					if( q == parms[i].substring( 0, pos ) ) {
-						qstr = decodeURIComponent( (parms[i].substring( pos+1 ) + '' ).replace(/\+/g, '%20' ) );
-						qarr = qstr.match( /([^\s"]+)|"([^"]*)"/g ) || [];
-						for ( let j=0; j < qarr.length; j++ ){
-							ref_terms[j] = qarr[j].replace( /"/g, '' );
-						}
-						break;
-					}
-				}
-			}
-
-			return ref_terms;
-		}
-
-		/**
 		* sanitize
 		*/
 		// force terms to array
 		terms = terms instanceof Array ? terms : [terms];
 		// terms array is empty, try to catch referrer search terms
 		if ( terms.length === 0 ) terms = _get_referrer_terms();
+		// still no terms? then abort mission.
+		if ( terms.length === 0 ) return;
 
 		// force selectors to array
 		selectors = selectors instanceof Array ? selectors : [selectors];
 		// selectors array is empty, default to body
 		if ( selectors.length === 0 ) selectors = ['body'];
 
-		// no terms? then abort mission.
-		if ( terms.length === 0 ) return;
 		// browse selectors and initiate terms highlighting for each
 		for ( let n in selectors ) {
 			let objects = document.querySelectorAll(selectors[n]);
