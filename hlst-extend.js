@@ -38,12 +38,98 @@
 			 */
 			'\u0410':'[\u0410\u0430]','\u0411':'[\u0411\u0431]','\u0412':'[\u0412\u0432]','\u0413':'[\u0413\u0433]','\u0414':'[\u0414\u0434]','\u0415':'[\u0415\u0435]','\u0401':'[\u0401\u0451]','\u0416':'[\u0416\u0436]','\u0417':'[\u0417\u0437]','\u0418':'[\u0418\u0438]','\u0419':'[\u0419\u0439]','\u041A':'[\u041A\u043A]','\u041B':'[\u041B\u043B]','\u041C':'[\u041C\u043C]','\u041D':'[\u041D\u043D]','\u041E':'[\u041E\u043E]','\u041F':'[\u041F\u043F]','\u0420':'[\u0420\u0440]','\u0421':'[\u0421\u0441]','\u0422':'[\u0422\u0442]','\u0423':'[\u0423\u0443]','\u0424':'[\u0424\u0444]','\u0425':'[\u0425\u0445]','\u0426':'[\u0426\u0446]','\u0427':'[\u0427\u0447]','\u0428':'[\u0428\u0448]','\u0429':'[\u0429\u0449]','\u042A':'[\u042A\u044A]','\u042B':'[\u042B\u044B]','\u042C':'[\u042C\u044C]','\u042D':'[\u042D\u044D]','\u042E':'[\u042E\u044E]','\u042F':'[\u042F\u044F]'
 		},
-		skip = ['SCRIPT', 'STYLE', 'INPUT', 'SELECT', 'BUTTON', 'OBJECT', 'APPLET', 'TEXTAREA', 'PRE', 'CODE', 'EMBED', 'IFRAME'];
+		skip = ['MARK', 'SCRIPT', 'STYLE', 'INPUT', 'SELECT', 'BUTTON', 'OBJECT', 'APPLET', 'TEXTAREA', 'PRE', 'CODE', 'EMBED', 'IFRAME'];
 
 	/**
 	 * PRIVATE METHODS
 	 */
 
+	/**
+	 * Accent REGEX from the jQuery highlight plugin by Marcel Stör <http://www.frightanic.com>
+	 * http://www.frightanic.com/projects/lenient-jquery-highlight-plugin-javascript/
+	 * MIT license.
+	 *
+	 * Creates a regexp for case- and accent-insensitive matching of a regular
+	 * alphabetic string. For each character in the original string the output
+	 * contains a regexp character class that matches the character itself and all
+	 * unicode variations. So, if the input is "Foo" the function returns
+	 * something like [Ff...][OoÖöÒò..][OoÖöÒò..].
+	 * Inspiration:
+	 * http://stackoverflow.com/questions/227950/programatic-accent-reduction-in-javascript-aka-text-normalization-or-unaccenting
+	 */
+	_accent_regex = function( characters ) {
+		// Replaces all accented characters.
+		var deaccentedString = _deaccent( characters );
+		// Escapes all regexp meta characters.
+		var cleanString = deaccentedString.replace(/([|()[{.+*?^$\\])/g,"\\$1");
+		var accentReplacer = function( character ) {
+			return charToAccentedCharClassMap[character] || character;
+		};
+		// Matches anything *but* a whitespace and replaces it.
+		var regexp = cleanString.replace(/\S/g, accentReplacer);
+		return new RegExp(regexp, "g");
+	}
+
+	/**
+	 * Returns a string in which each accented and lower-case character from the
+	 * input is replaced with the respective upper-case base character in the A-Z
+	 * range (e.g. ä->A, è->E, å->A, ë->E). Hence, the return value for
+	 * "séléction" is "SELECTION".
+	 */
+	_deaccent = function( accentedString ) {
+		var result = accentedString;
+		for ( var key in charToAccentedCharClassMap ) {
+			result = result.replace(new RegExp(charToAccentedCharClassMap[key], "g"), key);
+		}
+		return result;
+	}
+
+	_mark = function( node, regex, classname, deep ) {
+		if ( !node || typeof node == 'undefined' ) {
+			return;
+		}
+
+		var removeList = [];
+
+		do {
+			if ( skip.includes(node.nodeName.toUpperCase()) ) {
+				continue;
+			}
+			if ( node.nodeType === 3 ) {
+				// text node
+				let val = node.textContent;
+				// only new lines, tabs and spaces?
+				if ( val.replace(/\r|\n|\t|\s/gm, '').length < 1 ) {
+					continue;
+				}
+				let new_val = val.replace( regex, function(x){
+					return '<mark class="' + classname + '">' + x + '</mark>';
+				} );
+				if ( new_val !== val ) {
+					// create temporary element with new content
+					let tmp = document.createElement("span");
+					tmp.innerHTML = new_val;
+					// itterate throught tmp child nodes and move them to before current node
+					while ( tmp.firstChild ) {
+						node.parentNode.insertBefore(tmp.firstChild, node);
+					}
+					tmp.remove();
+					// add current node to removal array
+					removeList.push( node );
+				}
+			} else {
+				// crawl child node
+				if ( deep ) {
+					_mark( node.firstChild, regex, classname, deep );
+				}
+			}
+		} while ( node = node.nextSibling );
+
+		for ( let i = 0; i < removeList.length; i++ ) {
+			removeList[i].parentNode.removeChild(removeList[i]);
+		}
+	}
+		
 	/**
 	 * PUBLIC METHODS
 	 */
@@ -58,83 +144,7 @@
 		term_class = opts['class'] || 'hilite';
 		deep = opts['deep'] || false;
 
-		//console.log( this );
-		_mark( this, regex, term_class, deep );
-
-		/**
-		 * Accent REGEX from the jQuery highlight plugin by Marcel Stör <http://www.frightanic.com>
-		 * http://www.frightanic.com/projects/lenient-jquery-highlight-plugin-javascript/
-		 * MIT license.
-		 *
-		 * Creates a regexp for case- and accent-insensitive matching of a regular
-		 * alphabetic string. For each character in the original string the output
-		 * contains a regexp character class that matches the character itself and all
-		 * unicode variations. So, if the input is "Foo" the function returns
-		 * something like [Ff...][OoÖöÒò..][OoÖöÒò..].
-		 * Inspiration:
-		 * http://stackoverflow.com/questions/227950/programatic-accent-reduction-in-javascript-aka-text-normalization-or-unaccenting
-		 */
-		_accent_regex = function( characters ) {
-			// Replaces all accented characters.
-			var deaccentedString = _deaccent( characters );
-			// Escapes all regexp meta characters.
-			var cleanString = deaccentedString.replace(/([|()[{.+*?^$\\])/g,"\\$1");
-			var accentReplacer = function( character ) {
-				return charToAccentedCharClassMap[character] || character;
-			};
-			// Matches anything *but* a whitespace and replaces it.
-			var regexp = cleanString.replace(/\S/g, accentReplacer);
-			return new RegExp(regexp, "g");
-		}
-
-		/**
-		 * Returns a string in which each accented and lower-case character from the
-		 * input is replaced with the respective upper-case base character in the A-Z
-		 * range (e.g. ä->A, è->E, å->A, ë->E). Hence, the return value for
-		 * "séléction" is "SELECTION".
-		 */
-		_deaccent = function( accentedString ) {
-			var result = accentedString;
-			for ( var key in charToAccentedCharClassMap ) {
-				result = result.replace(new RegExp(charToAccentedCharClassMap[key], "g"), key);
-			}
-			return result;
-		}
-
-		_mark = function( node, regex, c, deep ) {
-			if ( !node || typeof node == 'undefined' || jQuery.inArray(node[0].nodeName, skip) > -1 || !node[0].innerHTML )
-				return;
-
-			console.log(node);
-			console.log(regex);
-			console.log(c);
-			console.log(deep);
-
-			var val,
-				new_val,
-				remove = [];
-
-			do {
-				if ( node.nodeType === 3 ) {
-					// text node
-					val = node.nodeValue;
-					new_val = val.replace( regex, function(x){
-						return '<mark class="' + c + '">' + x + '</mark>';
-					} );
-					if ( new_val !== val ) {
-						jQuery(node).before( new_val );
-						remove.push( node );
-					}
-				} else {
-					// crawl child node
-					if ( deep ) _mark( node.firstChild );
-				}
-			} while ( node = node.nextSibling );
-
-
-			remove.length && jQuery(remove).remove();
-		}
-
+		_mark( this.firstChild, regex, term_class, deep );
 	});
 
 	/**
@@ -153,7 +163,6 @@
 			var ref_terms = [],
 				ref = document.referrer.split('?'),
 				parms, q = 'q';
-			//console.log('referrer query parameters: ' + ref[1]);
 
 			// no query string found? then return false
 			if ( typeof ref[1] == 'undefined' ) return ref_terms;
@@ -167,19 +176,16 @@
 			} else if ( ref[0].indexOf('baidu.') > -1 ) {
 				q = 'wd';
 			}
-			//console.log('search engine term: ' + q);
+
 			parms = ref[1].split('&');
-			//console.log('parms split into ' + parms.length);
+
 			for ( var i=0; i < parms.length; i++ ) {
-				//console.log('parameter ' + i + ': ' + parms[i]);
 				var pos = parms[i].indexOf('=');
 				if ( pos > 0 ) {
 					if( q == parms[i].substring( 0, pos ) ) {
 						qstr = decodeURIComponent( (parms[i].substring( pos+1 ) + '' ).replace(/\+/g, '%20' ) );
-						//console.log('search query found: ' + qstr);
 						qarr = qstr.match( /([^\s"]+)|"([^"]*)"/g ) || [];
 						for ( var j=0; j < qarr.length; j++ ){
-							//console.log('added ' + qarr[j] + ' to search array');
 							ref_terms[j] = qarr[j].replace( /"/g, '' );
 						}
 						break;
@@ -205,21 +211,17 @@
 
 		// no terms? then abort mission.
 		if ( terms.length === 0 ) return;
-
 		// browse selectors and initiate terms highlighting for each
-		for ( n in selectors ) {
-			objects = document.querySelectorAll(selectors[n]);
-			if ( objects.length != 0 ) {
-				for ( s in terms ){
-					for ( o in objects )
-					objects[o].highlight( terms[s], {'class':'hilite term-' + s,'deep':deep} );
-					//objects.find('*').highlight(terms[s], 'mark', 'hilite term-' + s)
+		for ( let n in selectors ) {
+			let objects = document.querySelectorAll(selectors[n]);
+			for ( let i = 0; i < objects.length; i++ ) {
+				for ( let s in terms ) {
+					objects[i].highlight( terms[s], {'class':'hilite term-' + s,'deep':deep} );
 				}
-				// refrain to first element found if fistonly flag is set
-				if ( firstonly ) break;
 			}
+			// refrain to first element found if fistonly flag is set
+			if ( objects.length && firstonly ) break;
 		}
-
 		// Cufon compatibility
 		if ( typeof Cufon == 'function' ) Cufon.refresh();
 	});

@@ -120,14 +120,13 @@ class HighlightSearchTerms {
 		// abort if no search the_terms.
 		if ( ! self::have_search_terms() && ! self::have_hilite_terms() ) return;
 
-		wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__), array('jquery'), self::$version, true );
+		wp_enqueue_script( 'hlst-extend', plugins_url( 'hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ), array(), self::$version, true );
 
-		$terms = wp_json_encode( (array) self::$search_terms );
+		$terms = wp_json_encode( (array) self::get_terms() );
 		$areas = wp_json_encode( (array) self::$areas);
 
 		$script = '/* Highlight Search Terms '.self::$version.' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . PHP_EOL;
-		//$script .= "jQuery(document).on('ready post-load facetwp-loaded',function(){window.hilite({$terms},{$areas},true,true)});";
-		$script .= "window.addEventListener('load',function(){window.hilite({$terms},{$areas},true,true)});";
+		$script .= "window.addEventListener('DOMContentLoaded',function(){window.hilite({$terms},{$areas},true,true)});";
 		wp_add_inline_script( 'hlst-extend', $script );
 	}
 
