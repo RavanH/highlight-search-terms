@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.5.8
+Version: 1.6
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -43,7 +43,7 @@ class HighlightSearchTerms {
 	*/
 
 	// plugin version
-	private static $version = '1.5.8';
+	private static $version = '1.6';
 
 	// filtered search terms
 	private static $search_terms = null;
@@ -56,12 +56,13 @@ class HighlightSearchTerms {
 	// When referencing an *ID name*, just be sure to begin with a '#'.
 	// When referencing a *class name*, try to put the tag in front,
 	// followed by a '.' and then the class name to *improve script speed*.
-	static $areas = array(
+	static $selectors = array(
 		'#groups-dir-list', '#members-dir-list', // BuddyPress compat
 		'div.bbp-topic-content,div.bbp-reply-content,li.bbp-forum-info,.bbp-topic-title,.bbp-reply-title', // bbPress compat
 		'article',
 		'div.hentry',
 		'div.post',
+		'div.wp-block-query', // gutenberg query block 
 		'#content',
 		'#main',
 		'div.content',
@@ -117,16 +118,20 @@ class HighlightSearchTerms {
 	}
 
 	public static function enqueue_script() {
-		// abort if no search terms.
+		// abort if no search the_terms.
 		if ( ! self::have_search_terms() && ! self::have_hilite_terms() ) return;
 
-		wp_enqueue_script( 'hlst-extend', plugins_url('hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__), array('jquery'), self::$version, true );
+		wp_enqueue_script( 'hlst-extend', plugins_url( 'hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ), array(), self::$version, true );
 
-		$script =  '/* Highlight Search Terms ' . self::$version . ' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . PHP_EOL;
-		$script .= 'var hlst_query = ';
-		$script .= wp_json_encode( self::get_terms() );
-		$script .= '; var hlst_areas = ' . wp_json_encode( (array) self::$areas) . ';';
-		wp_add_inline_script( 'hlst-extend', $script, 'before' );
+		$terms = wp_json_encode( (array) self::get_terms() );
+		$selectors = wp_json_encode( (array) apply_filters( 'hlst_selectors', self::$selectors ) );
+
+		$script = '/* Highlight Search Terms '.self::$version.' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . PHP_EOL;
+		$script .= "const hlst = function(){window.hilite({$terms},{$selectors},true,true)};" . PHP_EOL;
+		$script .= "window.addEventListener('DOMContentLoaded',hlst);window.addEventListener('post-load',hlst);";
+
+		$script = apply_filters( 'hlst_inline_script', $script );
+		wp_add_inline_script( 'hlst-extend', $script );
 	}
 
 	private static function split_search_terms( $search ) {
