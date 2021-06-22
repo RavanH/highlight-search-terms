@@ -39,11 +39,11 @@
 			/*
 			 * Arabic. Thanks @khakan
 			 */
-			''       : '[\u0600-\u061f|\u063b-\u063f|\u064b-\u065e|\u066a-\u06ff]', // remove these diacritics, normalize the rest.
 			'\u0627' : '[\u0627|\u0622|\u0623|\u0625|\u08ad]',
 			'\u0649' : '[\u0649|\u0626]',
 			'\u0647' : '[\u0647|\u0629]',
 			'\u0648' : '[\u0648|\u0624]',
+			''       : '[\u0600-\u061f|\u063b-\u063f|\u064b-\u065e|\u066a-\u06ff]', // remove these diacritics, normalize the rest.
 			/*
 			 * Cyrillic. Thanks @dimmez
 			 */
