@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=r
 Tags: mark, highlight, hilite, search, term, terms, jquery
 Requires at least: 3.7
 Tested up to: 5.7
-Stable tag: 1.5.8
+Stable tag: 1.6
 
 Very lightweight jQuery script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
 
@@ -41,19 +41,29 @@ Modern HTML5 browsers will use their own highlighting style by default, which us
 
 In most cases, it should just work. But you can do two things to ensure backward browser and theme compatibility:
 
-**1. Define CSS rules:** There are _no_ configuration options and there is _no_ predefined highlight styling. You are completely free to define any CSS styling rules in your themes **main stylesheet (style.css)** or the **Custom CSS** tab if the WordPress theme customizer.
+1. **Define CSS rules:** There are _no_ configuration options and there is _no_ predefined highlight styling. You are completely free to define any CSS styling rules in your themes **main stylesheet (style.css)** or the **Custom CSS** tab if the WordPress theme customizer.
 You can find basic instructions and CSS examples in the [FAQ's](https://wordpress.org/plugins/highlight-search-terms/#faq).
 
-**2. Check your theme:** In most up to date themes (including WP's own default theme) post and page content is shown inside a div with class `hentry`. This means search terms found in post and page content will be highlighted but not similar terms that accidentaly show in the page header, sidebar or footer.
+1. **Check your theme:** In most up to date themes (including WP's own default theme) post and page content is shown inside a div with class `hentry`. This means search terms found in post and page content will be highlighted but not similar terms that accidentaly show in the page header, sidebar or footer.
 If your current theme does not use the `hentry` class (yet), this plugin will look for IDs `content`, `main` and finally `wrapper` but if none of those are found, it will not work for you out of the box. See the last of the [FAQ's](https://wordpress.org/plugins/highlight-search-terms/#faq) for ways to make it work.
+
+= Available hooks and filters =
+
+1. `hlst_query_vars` - The array of WordPress query variables that the plugin will identify as a search query. Must return an array. Default: `['search_terms','bbp_search']` (WordPress abd bbPress search)
+
+1. `hlst_input_get_args` - An array of GET variables that the plugin will identify as a search query. Must return an array. Default: `[]` (none)
+
+1. `hlst_selectors` - The array of possible HTML DOM element identifiers that the script will try. The first viable identifier it finds elements of will be scanned for search terms to mark, the rest is ignored. So the order is important here! Start with the element closest to, but still containing all the post/page title, excerpt or content. Must return an array. Default: `['#groups-dir-list','#members-dir-list','div.bbp-topic-content,div.bbp-reply-content,li.bbp-forum-info,.bbp-topic-title,.bbp-reply-title','article','div.hentry','div.post','#content','#main','div.content','#middle','#container','div.container','div.page','#wrapper','body']`
+
+1. `hlst_inline_script` - The inline script that will be added to the plugin script file. Can be used to add to or alter the inline script. Must return a string.
 
 = Known issues & development =
 
 1. If your theme does not wrap the main content section of your pages in a div with class "hentry" or HTML5 article tags, this plugin might not work for you out of the box. However, you can _make_ it work. See the last of the [FAQ's](http://wordpress.org/extend/plugins/highlight-search-terms/faq/) for an explanation.
 
-2. [Josh](http://theveganpost.com) pointed out a conflict with the ShareThis buttons plugin. Since then, that plugin has been completely rewriten so please let me know if the problem still exists. Thanks!
+1. [Josh](http://theveganpost.com) pointed out a conflict with the ShareThis buttons plugin. Since then, that plugin has been completely rewriten so please let me know if the problem still exists. Thanks!
 
-3. When search engine referrer is using SSL (notice the https:// in the URL) then the search terms cannot be determined. Most search engines are always over SSL nowadays. There is no way to get around that issue.
+1. When search engine referrer is using SSL (notice the https:// in the URL) then the search terms cannot be determined. Most search engines are always over SSL nowadays. There is no way to get around that issue.
 
 Please file bug reports and code contributions as pull requests on [GitHub](https://github.com/RavanH/highlight-search-terms).
 
@@ -142,16 +152,17 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 = 1.6 =
 
-
+Vanilla Javascript (no more jQuery!), Arabic character normalization and Jetpack Infinite Scroll support.
 
 == Changelog ==
 
 = 1.6 =
 
-Date
+Date 2021-06-22
 
-* Jetpack Infinite Scroll and FacetWP compatibility
-* Vanilla Javascript, no more jQuery dependency!
+* NEW: Vanilla Javascript, no more jQuery dependency!
+* NEW: Arabic character normalization map. Thanks @khakan
+* NEW: Jetpack Infinite Scroll support
 
 = 1.5.8 =
 
