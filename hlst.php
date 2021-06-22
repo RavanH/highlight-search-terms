@@ -110,7 +110,7 @@ class HighlightSearchTerms {
 
 	public static function append_search_query( $url ) {
 		// we need in_the_loop() check here to prevent apending query to menu links. But it breaks bbPress url support...
-		if ( in_the_loop() ) {
+		if ( in_the_loop() && ! strpos( $url, 'hilite=' ) ) {
 			$url = add_query_arg( 'hilite', urlencode( "'" . implode( "','", self::get_search_terms() ) . "'" ), $url );
 		}
 
