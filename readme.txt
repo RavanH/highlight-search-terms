@@ -1,12 +1,12 @@
 === Highlight Search Terms ===
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ravanhagen%40gmail%2ecom&amp;item_name=Highlight%20Search%20Terms&amp;no_shipping=0&amp;tax=0&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8
-Tags: mark, highlight, hilite, search, term, terms, jquery
+Tags: mark, highlight, hilite, search, term, terms
 Requires at least: 3.7
 Tested up to: 5.7
 Stable tag: 1.6
 
-Very lightweight jQuery script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
+Very lightweight (vanilla Java)script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
 
 
 == Description ==
@@ -15,8 +15,7 @@ Highlights search terms within WordPress generated search results _or_ when refe
 
 This plugin is light weight and has no options. It started as very simple fusion between <a href="http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/">How to Highlight Search Terms with jQuery - theme hack by Thaya Kareeson</a> and <a href="http://wordpress.org/extend/plugins/google-highlight/">Search Hilite by Ryan Boren</a>. It has since evolved with many optimizations, HTML5 and bbPress support.
 
-Many WordPress sites are already top-heavy with all kinds of resource hungry plugins that require a lot of options to be set and subsequently more database queries. The Highlight Search Terms plugin for WordPress is constructed to be as low impact / low resource demanding as possible, keeping server response and page load times low.
-This is done by going without any back-end options page, no filtering of post content and no extra database entries. A limited amount of hooks are used. The rest is done by jQuery javascript extention and your own CSS.
+Since version 1.6 it no longer depends on the jQuery library.
 
 **Features**
 
@@ -28,8 +27,7 @@ This is done by going without any back-end options page, no filtering of post co
 
 = What does it do? =
 
-This low impact plugin uses only a few action hooks to define some variables and to add the hilite jQuery extension to your page source code.
-The jQuery extension that runs after the page has loaded, finds all search terms on that page inside each div with class `hentry` (or ID `content`, `main` or `wrapper`...) and wraps them in `<mark class="hilite term-N"> ... </mark>` tags.
+This low impact plugin finds all search terms on a search results page inside each post and highlights them with a `<mark class="hilite term-N"> ... </mark>` tag.
 Note that N is a number starting with 0 for the first term used in the search phrase increasing 1 for each additional term used. Any part of a search phrase wrapped in quotes is considered as a single term.
 
 = What does it NOT do? =
@@ -131,16 +129,7 @@ Keep in mind that for the _first_ search term the additional class "term-0" is u
 
 = I really do not see any highlighting! =
 
-Due to a problem with jQuery's `$('body')` call in combination with many other scripts (like Google Ads, Analytics, Skype Check and other javascript) in the ever increasingly popular Firefox browser, I have had to limit the script search term wrapping to a particular div instead of the whole document body.
-I chose div with class "hentry" since that is the most commonly used content layer class in WordPress themes. If that is not available, the script will look for divs #content then #main then #wrapper. However, in your particular theme, none of these divs might be available...
-
-Let's suppose your theme's index.php or single.php has no `<div <?php post_class() ?> ... >` but wraps the post/page content in a `<div id="common" class="content"> ... </div>`. You can do one of three things to solve this:
-
-A. Change your theme templates like single.php, page.pho and search.php so the post/page content div has a class "hentry" (you can append it to existing classes with a space like `class="content hentry"`).
-
-B. Change the source of wp-content/plugins/highlight-search-terms/hlst.php so that the array starting on line 55 contains your main content ID or class name. In the above example that can be either `'#common',` or `'.content',` where a prefix '#' is used for ID and '.' for class.
-
-C. Switch to a theme that does abide by the current WordPress conventions :)
+Then you might be experiencing a bug or plugin/theme conflict. Maybe it's time to get some [Support](https://wordpress.org/support/plugin/highlight-search-terms/) :)
 
 
 == Screenshots ==
