@@ -11,7 +11,7 @@ Very lightweight (vanilla Java)script that wraps search terms in an HTML5 mark t
 
 == Description ==
 
-Highlights search terms within WordPress generated search results _or_ when referrer is a non-secure search engine, both on the search results page _and_ on the post page itself.
+Highlights search terms within WordPress generated search results, both on the search results page _and_ on each linked post page itself.
 
 This plugin is light weight and has no options. It started as very simple fusion between <a href="http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/">How to Highlight Search Terms with jQuery - theme hack by Thaya Kareeson</a> and <a href="http://wordpress.org/extend/plugins/google-highlight/">Search Hilite by Ryan Boren</a>. It has since evolved with many optimizations, HTML5 and bbPress support.
 
