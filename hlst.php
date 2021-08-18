@@ -162,7 +162,6 @@ class HighlightSearchTerms {
 		$query_vars = apply_filters( 'hlst_query_vars', array( 'search_terms', 'bbp_search' ) );
 		foreach ( (array) $query_vars as $qvar ) {
 			$search = get_query_var( $qvar, false );
-			var_dump($search);
 			if ( $search ) {
 				self::$search_terms = self::split_search_terms( $search );
 				return;
