@@ -43,7 +43,7 @@ class HighlightSearchTerms {
 	*/
 
 	// plugin version
-	private static $version = '1.6';
+	private static $version = '1.6.1';
 
 	// filtered search terms
 	private static $search_terms = null;
