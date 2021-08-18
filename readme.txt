@@ -139,11 +139,17 @@ Then you might be experiencing a bug or plugin/theme conflict. Maybe it's time t
 
 == Upgrade Notice ==
 
-= 1.6 =
+= 1.6.1 =
 
-Vanilla Javascript (no more jQuery!), Arabic character normalization and Jetpack Infinite Scroll support.
+Fixes NinjaFirewall incompatibility, thanks @danielrufde.
 
 == Changelog ==
+
+= 1.6.1 =
+
+Date 2021-08-18
+
+* FIX: NinjaFirewall incompatibility, thanks @danielrufde
 
 = 1.6 =
 
