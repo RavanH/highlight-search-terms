@@ -3,7 +3,7 @@ Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ravanhagen%40gmail%2ecom&amp;item_name=Highlight%20Search%20Terms&amp;no_shipping=0&amp;tax=0&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8
 Tags: mark, highlight, hilite, search, term, terms
 Requires at least: 3.7
-Tested up to: 5.7
+Tested up to: 5.8
 Stable tag: 1.6.1
 
 Very lightweight (vanilla Java)script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
