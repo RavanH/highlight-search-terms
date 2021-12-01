@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.6.1
+Version: 1.6.2-beta
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -74,6 +74,9 @@ class HighlightSearchTerms {
 		'body'
 	);
 
+	// filtered hilite terms
+	private static $script_enqueued = false;
+
 	/**
 	* Plugin functions
 	*/
@@ -125,8 +128,8 @@ class HighlightSearchTerms {
 	}
 
 	public static function enqueue_script() {
-		// abort if no search the_terms.
-		if ( ! self::have_search_terms() && ! self::have_hilite_terms() ) return;
+		// abort if no search terms or script was already enqueued.
+		if ( self::$script_enqueued || ( ! self::have_search_terms() && ! self::have_hilite_terms() ) ) return;
 
 		wp_enqueue_script( 'hlst-extend', plugins_url( 'hlst-extend' . ( defined('WP_DEBUG') && true == WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ), array(), self::$version, true );
 
@@ -139,6 +142,8 @@ class HighlightSearchTerms {
 
 		$script = apply_filters( 'hlst_inline_script', $script );
 		wp_add_inline_script( 'hlst-extend', $script );
+
+		self::$script_enqueued = true;
 	}
 
 	private static function split_search_terms( $search ) {
