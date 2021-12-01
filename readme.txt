@@ -145,6 +145,13 @@ Fixes NinjaFirewall incompatibility, thanks @danielrufde.
 
 == Changelog ==
 
+= 1.6.2-beta =
+
+Date 2021-12-01
+
+* TODO convert static class to namespace?
+* FIX: Possible double inline script
+
 = 1.6.1 =
 
 Date 2021-08-18
