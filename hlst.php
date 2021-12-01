@@ -11,23 +11,23 @@ Text Domain: highlight-search-terms
 
 /*  Copyright 2021  RavanH  (email : ravanhagen@gmail.com)
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, <http://www.gnu.org/licenses/> or
-    write to the Free Software Foundation Inc., 59 Temple Place,
-    Suite 330, Boston, MA  02111-1307  USA.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, <http://www.gnu.org/licenses/> or
+	write to the Free Software Foundation Inc., 59 Temple Place,
+	Suite 330, Boston, MA  02111-1307  USA.
 
-    The GNU General Public License does not permit incorporating this
-    program into proprietary programs.
+	The GNU General Public License does not permit incorporating this
+	program into proprietary programs.
 */
 
 if ( ! defined( 'WPINC' ) ) die;
@@ -78,40 +78,22 @@ class HighlightSearchTerms {
 	private static $script_enqueued = false;
 
 	/**
-	* Plugin functions
+	* Public methods.
 	*/
-
-	public static function init() {
-		// -- HOOKING INTO WP -- //
-		// append search query string to results permalinks
-		// wp is the earliest hook where get_query_var('search_terms') will return results
-		add_action( 'wp', array( __CLASS__, 'add_url_filters' ) );
-
-		// enqueue main script
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
-
-		// text domain
-		//if ( is_admin() )
-		//	add_action('plugins_loaded', array(__CLASS__, 'load_textdomain'));
-	}
-
-	public static function load_textdomain() {
-		load_plugin_textdomain( 'highlight-search-terms' );
-	}
 
 	public static function add_url_filters() {
 		// abort if admin or singular or no search terms.
 		if ( is_admin() || ! self::have_search_terms() ) return;
 
-		add_filter( 'post_link', array( __CLASS__, 'append_search_query' ) );
-		add_filter( 'post_type_link', array( __CLASS__, 'append_search_query' ) );
-		add_filter( 'page_link', array( __CLASS__, 'append_search_query' ) );
+		add_filter( 'post_link', array( __CLASS__, 'add_search_query_arg' ) );
+		add_filter( 'post_type_link', array( __CLASS__, 'add_search_query_arg' ) );
+		add_filter( 'page_link', array( __CLASS__, 'add_search_query_arg' ) );
 		// for bbPress search result links.
-		add_filter( 'bbp_get_topic_permalink', array( __CLASS__, 'append_search_query' ) );
-		add_filter( 'bbp_get_reply_url', array( __CLASS__, 'append_search_query' ) );
+		add_filter( 'bbp_get_topic_permalink', array( __CLASS__, 'add_search_query_arg' ) );
+		add_filter( 'bbp_get_reply_url', array( __CLASS__, 'add_search_query_arg' ) );
 	}
 
-	public static function append_search_query( $url ) {
+	public static function add_search_query_arg( $url ) {
 		// we need in_the_loop() check here to prevent apending query to menu links. But it breaks bbPress url support...
 		if ( in_the_loop() && ! strpos( $url, 'hilite=' ) ) {
 			$terms = array();
@@ -223,6 +205,20 @@ class HighlightSearchTerms {
 	private static function get_terms() {
 		return array_merge( self::get_search_terms(), self::get_hilite_terms() );
 	}
+
+	private function __construct() {
+		// Nothing to do - there are no instances.
+	}
 }
 
-HighlightSearchTerms::init();
+// -- HOOKING INTO WP -- //
+// Append search query string to results permalinks.
+// 'wp' is the earliest hook where get_query_var('search_terms') will return results.
+add_action( 'wp', array( 'HighlightSearchTerms', 'add_url_filters' ) );
+
+// enqueue main script
+add_action( 'wp_enqueue_scripts', array( 'HighlightSearchTerms', 'enqueue_script' ) );
+
+// Text domain.
+//if ( is_admin() )
+//	add_action('plugins_loaded', function() { load_plugin_textdomain( 'highlight-search-terms' ); } );
