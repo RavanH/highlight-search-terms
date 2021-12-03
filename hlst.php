@@ -63,6 +63,7 @@ class HighlightSearchTerms {
 		'div.hentry',
 		'div.post',
 		'div.wp-block-query', // gutenberg query block 
+		'main',
 		'#content',
 		'#main',
 		'div.content',
