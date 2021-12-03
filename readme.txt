@@ -6,8 +6,7 @@ Requires at least: 3.7
 Tested up to: 5.8
 Stable tag: 1.6.1
 
-Very lightweight (vanilla Java)script that wraps search terms in an HTML5 mark tag within wp search results or when referrer is a non-secure search engine.
-
+Very lightweight (vanilla) Javascript that wraps search terms in an HTML5 mark tag within WordPress search results.
 
 == Description ==
 
@@ -42,7 +41,7 @@ In most cases, it should just work. But you can do two things to ensure backward
 1. **Define CSS rules:** There are _no_ configuration options and there is _no_ predefined highlight styling. You are completely free to define any CSS styling rules in your themes **main stylesheet (style.css)** or the **Custom CSS** tab if the WordPress theme customizer.
 You can find basic instructions and CSS examples in the [FAQ's](https://wordpress.org/plugins/highlight-search-terms/#faq).
 
-1. **Check your theme:** In most up to date themes (including WP's own default theme) post and page content is shown inside a div with class `hentry`. This means search terms found in post and page content will be highlighted but not similar terms that accidentaly show in the page header, sidebar or footer.
+1. **Check your theme:** In most up to date themes (including WP's own default theme) post and page content is shown inside a div with class `hentry`. This means search terms found in post and page content will be highlighted but not similar terms that accidentally show in the page header, sidebar or footer.
 If your current theme does not use the `hentry` class (yet), this plugin will look for IDs `content`, `main` and finally `wrapper` but if none of those are found, it will not work for you out of the box. See the last of the [FAQ's](https://wordpress.org/plugins/highlight-search-terms/#faq) for ways to make it work.
 
 = Available hooks and filters =
@@ -97,39 +96,62 @@ Edit your themes stylesheet (style.css) or the WordPress theme customizer Custom
 
 = I want to customize the highlighting but have no idea what to put in my stylesheet. Can you give me some examples? =
 
-Go in your WP admin section to Appearance > Customize and add one of the examples below to get you started.
+Go in your WP admin section to Appearance > Customize > Custom CSS and add one of the examples below to get you started.
 
 For a moss green background highlighting:
 
-    .hilite { background-color:#D3E18A }
+    .hilite {
+        background-color: #D3E18A;
+    }
 
 Yellow background highlighting:
 
-    .hilite { background-color:yellow }
+    .hilite {
+        background-color: yellow;
+    }
 
 A light blue background with bold font:
 
-    .hilite { background-color:#9CD4FF; font-weight:bold }
+    .hilite {
+        background-color: #9CD4FF;
+        font-weight: bold;
+    }
 
 Orange background with black font:
 
-    .hilite { background-color:#FFCA61; color:#000000 }
+    .hilite {
+        background-color:#FFCA61;
+        color: #000000;
+    }
 
 = Please give me more advanced CSS examples =
 
 If you want to give different terms used in a search phrase a different styling, use the class "term-N" where N is a number starting with 0, increasing 1 with each additional search term, to define your CSS rules.
 The below example will make every instance of any term used in the query show up in bold text and a yellow background except for any instance of a second, third and fourth term which will have respectively a light green, light blue and orange background.
 
-    .hilite { background-color:yellow; font-weight:bold } /* default */
-    .term-1 { background-color:#D3E18A } /* second search term only */
-    .term-2 { background-color:#9CD4FF } /* third search term only */
-    .term-3 { background-color:#FFCA61 } /* fourth search term only */
+    /* Default highlighting, but bold text. */
+    .hilite {
+        background-color: yellow;
+        font-weight: bold;
+    }
+    /* Moss green highlighting for second search term only. */
+    .term-1 {
+        background-color: #D3E18A;
+    }
+    /* Light blue highlighting for third search term only. */
+    .term-2 {
+        background-color: #9CD4FF;
+    }
+    /* Orange highlighting for fourth search term only. */ 
+    .term-3 {
+        background-color:#FFCA61
+    }
 
 Keep in mind that for the _first_ search term the additional class "term-0" is used, not "term-1"!
 
 = I really do not see any highlighting! =
 
-Then you might be experiencing a bug or plugin/theme conflict. Maybe it's time to get some [Support](https://wordpress.org/support/plugin/highlight-search-terms/) :)
+Then you might be experiencing a bug or plugin/theme conflict. Time to get some [Support](https://wordpress.org/support/plugin/highlight-search-terms/) :)
 
 
 == Screenshots ==
@@ -150,6 +172,7 @@ Fixes NinjaFirewall incompatibility, thanks @danielrufde.
 Date 2021-12-01
 
 * TODO convert static class to namespace?
+* Search for HTML5 main tag
 * FIX: Possible double inline script
 
 = 1.6.1 =
