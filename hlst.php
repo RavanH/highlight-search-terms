@@ -228,7 +228,3 @@ function enqueue_script() {
 	$script_enqueued = true;
 }
 \add_action( 'wp_enqueue_scripts', __NAMESPACE__.'\enqueue_script' );
-
-// Text domain.
-//if ( is_admin() )
-//	add_action('plugins_loaded', function() { load_plugin_textdomain( 'highlight-search-terms' ); } );
