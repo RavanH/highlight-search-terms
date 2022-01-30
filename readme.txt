@@ -190,11 +190,18 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Upgrade Notice ==
 
-= 1.7.0 =
+= 1.8.0 =
 
-Switch to mark.js, new filter hlst_events and bugfixes
+Woocommerce and Search Filter Pro compatibility
 
 == Changelog ==
+
+= 1.8.0 =
+
+Date 2022-01-30
+
+* NEW: Woocommerce compatibility
+* NEW: Search Filter Pro compatibility
 
 = 1.7.0 =
 

@@ -3,13 +3,13 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.7.0
+Version: 1.8.0
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
 */
 
-/*  Copyright 2021  RavanH  (email : ravanhagen@gmail.com)
+/*  Copyright 2022  RavanH  (email : ravanhagen@gmail.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -215,7 +215,7 @@ function enqueue_script() {
 	$script = '/* Highlight Search Terms '.VERSION.' ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . \PHP_EOL;
 	//$script .= "const hlst = function(){window.hilite({$terms},{$selectors},true,true)};" . \PHP_EOL;
 	$script .= "(function(){const t={$terms},m={$selectors}," . \PHP_EOL;
-	$script .= 'hlst=function(){for(let n in m){let o=document.querySelectorAll(m[n]);if(!o.length){continue;}for(let i=0;i<o.length;i++){for(let s in t){var j=new Mark(o[i]);j.mark(t[s],{"className":"hilite term-"+s,"separateWordSearch":false});}}if(o.length){break;}}if(typeof Cufon=="function")Cufon.refresh();}' . \PHP_EOL;
+	$script .= 'hlst=function(){for(let n in m){let o=document.querySelectorAll(m[n]);if(!o.length){continue;}for(let i=0;i<o.length;i++){for(let s in t){var j=new Mark(o[i]);j.mark(t[s],{"className":"hilite term-"+s,"exclude":["script","style","title","head","html","mark","iframe","input","textarea"],"separateWordSearch":false});}}if(o.length){break;}}if(typeof Cufon=="function")Cufon.refresh();}' . \PHP_EOL;
 	foreach ( $events as $event ) {
 		$script .= "window.addEventListener('{$event}',hlst);";
 	}
@@ -228,3 +228,24 @@ function enqueue_script() {
 	$script_enqueued = true;
 }
 \add_action( 'wp_enqueue_scripts', __NAMESPACE__.'\enqueue_script' );
+
+/**
+ * Plugin compatibilities
+ * @since v.1.8.0
+ */
+
+function load_compat() {
+	// Search & Filter Pro compatibility.
+	if ( \is_plugin_active( 'search-filter-pro/search-filter-pro.php' ) ) {
+		include_once \dirname( __FILE__ ) . '/inc/search-filter-pro.php';
+	}
+
+	// FacetWP compatibility TODO
+
+	// WooCommerce compatibility.
+	if ( \is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+		include_once \dirname( __FILE__ ) . '/inc/woocommerce.php';
+	}
+
+}
+\add_action( 'wp_loaded', __NAMESPACE__.'\load_compat' );
