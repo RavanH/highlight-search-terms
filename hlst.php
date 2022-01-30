@@ -35,7 +35,7 @@ namespace HLST;
 \defined( '\WPINC' ) || die;
 
 /* Plugin version. */
-const VERSION = '1.7.0';
+const VERSION = '1.8.0';
 
 /* Node selectors the script will search for. Use filter 'hlst_selectors' to change or override these. */
 const NODE_SELECTORS = array (
