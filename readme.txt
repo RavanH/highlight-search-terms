@@ -185,16 +185,22 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Screenshots ==
 
-1. An example image provided by [How to Highlight Search Terms with jQuery](http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/ "How to Highlight Search Terms with jQuery | Weblog Tools Collection") on which this plugin is largely based.
+1. Example of search term highlighting with the default MARK tag. 
 
 
 == Upgrade Notice ==
 
-= 1.8.0 =
+= 1.8.1 =
 
-Woocommerce and Search Filter Pro compatibility
+Fix possible missing is_plugin_active error
 
 == Changelog ==
+
+= 1.8.0 =
+
+Date 2022-01-31
+
+* Fix possible missing is_plugin_active error
 
 = 1.8.0 =
 

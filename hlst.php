@@ -235,6 +235,9 @@ function enqueue_script() {
  */
 
 function load_compat() {
+	// make sure is_plugin_active() is available
+	include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
 	// Search & Filter Pro compatibility.
 	if ( \is_plugin_active( 'search-filter-pro/search-filter-pro.php' ) ) {
 		include_once \dirname( __FILE__ ) . '/inc/search-filter-pro.php';
