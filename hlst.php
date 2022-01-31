@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag when referrer is a non-secure search engine or within wp search results. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/other_notes/">Other Notes</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.8.0
+Version: 1.8.1
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -35,7 +35,7 @@ namespace HLST;
 \defined( '\WPINC' ) || die;
 
 /* Plugin version. */
-const VERSION = '1.8.0';
+const VERSION = '1.8.1';
 
 /* Node selectors the script will search for. Use filter 'hlst_selectors' to change or override these. */
 const NODE_SELECTORS = array (
