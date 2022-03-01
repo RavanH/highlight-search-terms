@@ -5,7 +5,7 @@ Tags: mark, highlight, hilite, search, term, terms
 Requires at least: 3.7
 Requires PHP: 5.6
 Tested up to: 5.9
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 
 Very lightweight (vanilla) Javascript that wraps search terms in an HTML5 mark tag within WordPress search results.
 
@@ -147,7 +147,7 @@ The below example will make every instance of any term used in the query show up
     .term-2 {
         background-color: #9CD4FF;
     }
-    /* Orange highlighting for fourth search term only. */ 
+    /* Orange highlighting for fourth search term only. */
     .term-3 {
         background-color:#FFCA61
     }
@@ -183,16 +183,22 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Screenshots ==
 
-1. Example of search term highlighting with the default MARK tag. 
+1. Example of search term highlighting with the default MARK tag.
 
 
 == Upgrade Notice ==
 
-= 1.8.1 =
+= 1.8.2 =
 
-Fix possible missing is_plugin_active error
+Fix T_TRY error
 
 == Changelog ==
+
+= 1.8.2 =
+
+Date 2022-03-01
+
+* Fix T_TRY error
 
 = 1.8.1 =
 
