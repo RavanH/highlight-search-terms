@@ -3,7 +3,7 @@
 Plugin Name: Highlight Search Terms
 Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
 Description: Wraps search terms in the HTML5 mark tag. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/#faq">FAQ's</a> for instructions and examples for styling the highlights. <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ravanhagen%40gmail%2ecom&item_name=Highlight%20Search%20Terms&no_shipping=0&tax=0&bn=PP%2dDonationsBF&charset=UTF%2d8&lc=us" title="Thank you!">Tip jar</a>.
-Version: 1.8.1
+Version: 1.8.2
 Author: RavanH
 Author URI: http://status301.net/
 Text Domain: highlight-search-terms
@@ -35,7 +35,7 @@ namespace HLST;
 \defined( '\WPINC' ) || die;
 
 /* Plugin version. */
-const VERSION = '1.8.1';
+const VERSION = '1.8.2';
 
 /* Node selectors the script will search for. Use filter 'hlst_selectors' to change or override these. */
 const NODE_SELECTORS = array (
@@ -94,10 +94,10 @@ class Terms {
 	* Public methods.
 	*/
 
-	public static function get( $texturize = false ) {
+	public static function get() {
 		// Did we look for search terms before?
 		if ( ! isset( self::$terms ) ) {
-			self::try();
+			self::set();
 		}
 
 		return self::$terms;
@@ -106,8 +106,8 @@ class Terms {
 	/**
 	* Private methods.
 	*/
-	
-	private static function try() {
+
+	private static function set() {
 		// try know query vars.
 		$query_vars = \apply_filters( 'hlst_query_vars', QUERY_VARS );
 		foreach ( (array) $query_vars as $qvar ) {
@@ -129,7 +129,7 @@ class Terms {
 						return;
 					}
 				}
-			}	
+			}
 		}
 
 		// otherwise set empty array.
@@ -138,9 +138,9 @@ class Terms {
 
 	private static function split( $search ) {
 		if ( \is_array( $search ) ) return $search;
-	
+
 		$return = array();
-	
+
 		if ( \preg_match_all( '/([^\s",\+]+)|"([^"]*)"|\'([^\']*)\'/', \stripslashes( \urldecode( $search ) ), $terms ) ) {
 			foreach( $terms[0] as $term ) {
 				$term = \trim( \str_replace( array( '"','%22','%27' ), '', $term ) );
@@ -148,14 +148,14 @@ class Terms {
 					$return[] = $term;
 			}
 		}
-	
+
 		return $return;
 	}
 
 	private function __construct() {
 		// Nothing to do - there are no instances.
 	}
-	
+
 }
 
 /* ----------------- *
