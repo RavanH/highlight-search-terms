@@ -172,6 +172,8 @@ function add_url_filters() {
 	\add_filter( 'post_link', __NAMESPACE__.'\add_search_query_arg' );
 	\add_filter( 'post_type_link', __NAMESPACE__.'\add_search_query_arg' );
 	\add_filter( 'page_link', __NAMESPACE__.'\add_search_query_arg' );
+	// TODO test replace with \add_filter( 'the_permalink', __NAMESPACE__.'\\add_search_query_arg' );
+
 	// for bbPress search result links.
 	\add_filter( 'bbp_get_topic_permalink', __NAMESPACE__.'\add_search_query_arg' );
 	\add_filter( 'bbp_get_reply_url', __NAMESPACE__.'\add_search_query_arg' );

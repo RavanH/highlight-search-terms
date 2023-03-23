@@ -194,6 +194,9 @@ Fix T_TRY error
 
 == Changelog ==
 
+TODO test 6.2 compat
+TODO test the_permalink hook
+
 = 1.8.2 =
 
 Date 2022-03-01
