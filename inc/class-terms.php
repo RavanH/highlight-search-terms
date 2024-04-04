@@ -3,14 +3,14 @@
  * Terms class
  *
  * @package Highlight Search Terms
- *
- * @since
  */
 
 namespace HLST;
 
 /**
  * Terms class.
+ *
+ * @since 1.7
  */
 class Terms {
 	/**
