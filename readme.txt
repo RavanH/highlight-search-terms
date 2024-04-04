@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=r
 Tags: mark, highlight, hilite, search, term, terms
 Requires at least: 3.7
 Requires PHP: 5.6
-Tested up to: 6.2
+Tested up to: 6.5
 Stable tag: 1.8.2
 
 Very lightweight (vanilla) Javascript that wraps search terms in an HTML5 mark tag within WordPress search results.
