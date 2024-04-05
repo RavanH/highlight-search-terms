@@ -1,7 +1,7 @@
 === Highlight Search Terms ===
 Contributors: RavanH
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ravanhagen%40gmail%2ecom&amp;item_name=Highlight%20Search%20Terms&amp;no_shipping=0&amp;tax=0&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8
-Tags: mark, highlight, hilite, search, term, terms
+Tags: search, search terms, highlight, hilite, mark
 Requires at least: 3.7
 Requires PHP: 5.6
 Tested up to: 6.5
@@ -13,17 +13,23 @@ Very lightweight (vanilla) Javascript that wraps search terms in an HTML5 mark t
 
 Highlights search terms within WordPress generated search results, both on the search results page _and_ on each linked post page itself.
 
-This plugin is light weight and has no options. It started as very simple fusion between <a href="http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/">How to Highlight Search Terms with jQuery - theme hack by Thaya Kareeson</a> and <a href="http://wordpress.org/extend/plugins/google-highlight/">Search Hilite by Ryan Boren</a>. It has since evolved with many optimizations, HTML5 and bbPress support.
+This plugin is light weight and has no options. It started as very simple fusion between <a href="http://weblogtoolscollection.com/archives/2009/04/10/how-to-highlight-search-terms-with-jquery/">How to Highlight Search Terms with jQuery - theme hack by Thaya Kareeson</a> and <a href="http://wordpress.org/extend/plugins/google-highlight/">Search Hilite by Ryan Boren</a>.
 
-Since version 1.6 it no longer depends on the jQuery library.
+It has since evolved with many optimizations, HTML5 and other plugin compatibility. Since version 1.6 it no longer depends on the jQuery library.
 
 **Features**
 
-- Click through highlights: Highlights not only on WP search results page but also one click deeper inside any of the found pages
+- Click through highlights: Highlights not only on WP search results page but also one click deeper inside a post page
 - Character and case insensitive (lenient) highlighting
-- BuddyPress / bbPress compatibility: highlighting within forum searches
 - Caching (WP Super Cache) compatibility
 - Search terms wrapped in double quotes now considered as single term
+
+Compatible with:
+
+- Woocommerce
+- Search Filter Pro
+- BuddyPress
+- bbPress
 
 = What does it do? =
 
