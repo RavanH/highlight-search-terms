@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=r
 Tags: search, search terms, highlight, hilite, mark
 Requires at least: 3.7
 Requires PHP: 5.6
-Tested up to: 6.8
-Stable tag: 1.8.3
+Tested up to: 7.0
+Stable tag: 1.8.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -197,15 +197,24 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Upgrade Notice ==
 
-= 1.8.3 =
+= 1.8.4 =
 
-WP coding standards.
+Improve default block theme compatibility.
 
 
 == Changelog ==
 
+= 1.8.4 =
+
+Date 2026-05-26
+
+* Improved T25 theme compatibility
+* WP 7 compatibilty tested
+
 = 1.8.3 =
-2024-04-05
+
+Date 2024-04-05
+
 * Update to WP coding standards
 * WP 6.5 compatibility tested
 
