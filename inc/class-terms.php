@@ -22,6 +22,8 @@ class Terms {
 
 	/**
 	 * Get search terms.
+	 *
+	 * @return array
 	 */
 	public static function get() {
 		// Did we look for search terms before?
@@ -68,6 +70,8 @@ class Terms {
 	 * Split.
 	 *
 	 * @param string|array $search The search string to split up into terms.
+	 *
+	 * @return array
 	 */
 	private static function split( $search ) {
 		if ( \is_array( $search ) ) {
