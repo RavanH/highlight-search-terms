@@ -1,6 +1,6 @@
 === Highlight Search Terms ===
 Contributors: RavanH
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=ravanhagen%40gmail%2ecom&amp;item_name=Highlight%20Search%20Terms&amp;no_shipping=0&amp;tax=0&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8
+Donate link: https://donate.stripe.com/6oUbJ10Nz8xYfF7b5qdEs01
 Tags: search, search terms, highlight, hilite, mark
 Requires at least: 3.7
 Requires PHP: 5.6
