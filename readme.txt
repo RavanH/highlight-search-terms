@@ -81,7 +81,7 @@ Please file bug reports and code contributions as pull requests on [GitHub](http
 To make it work, you will need to take up to three steps, depending on your wishes and WordPress theme. (I) A normal installation and activation procedure; (II) Make sure your theme uses any of the recognized classes or ID's for the post content div so that the script knows where and where not to look for search terms;
 _and_ (III) optionally add CSS styling rules to get highlighting for older browsers that do not support HTML5 like Internet Explorer 8 and below.
 
-**I.** [Install now](http://coveredwebservices.com/wp-plugin-install/?plugin=highlight-search-terms) _or_ use the slick search and install feature (Plugins > Add New and search for "highlight search terms") in your WP2.7+ admin section _or_ follow these basic steps.
+**I.** Go to Plugins > Add New and search for "highlight search terms" in your WordPress admin _or_ follow these basic steps.
 
 1. Download archive and unpack.
 2. Upload (and overwrite) the /highlight-search-terms/ folder and its content to the /plugins/ folder.
