@@ -26,12 +26,13 @@ It has since evolved with many optimizations, HTML5 and other plugin compatibili
 - Caching (WP Super Cache) compatibility
 - Search terms wrapped in double quotes now considered as single term
 
-Compatible with:
+**Compatible with**
 
-- Woocommerce
-- Search Filter Pro
-- BuddyPress
-- bbPress
+- [Woocommerce](https://wordpress.org/plugins/woocommerce/)
+- [Queryra AI Search for WooCommerce](https://wordpress.org/plugins/queryra-ai-search/) see [documentation](https://queryra.com/docs/highlight-search-terms-integration)
+- [Search & Filter Pro](https://searchandfilter.com/)
+- [BuddyPress](https://wordpress.org/plugins/buddypress/)
+- [bbPress](https://wordpress.org/plugins/bbpress/)
 
 = What does it do? =
 
