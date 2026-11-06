@@ -5,7 +5,7 @@ Tags: search, search terms, highlight, hilite, mark
 Requires at least: 3.7
 Requires PHP: 5.6
 Tested up to: 7.2
-Stable tag: 1.8.4
+Stable tag: 1.8.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -198,12 +198,19 @@ C. Switch to a theme that does abide by the current WordPress conventions :)
 
 == Upgrade Notice ==
 
-= 1.8.4 =
+= 1.8.5 =
 
-Improve default block theme compatibility.
+Improve loading.
 
 
 == Changelog ==
+
+= 1.8.5 =
+
+Date: 20261106
+
+* Only load on front-end
+* Update compatibility/tested info
 
 = 1.8.4 =
 
