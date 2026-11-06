@@ -7,6 +7,7 @@
  * Author: RavanH
  * Author URI: http://status301.net/
  * Text Domain: highlight-search-terms
+ * License: GPLv2 or later
  *
  * @package Highlight Search Terms
  */
