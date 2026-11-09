@@ -11,19 +11,16 @@ namespace HLST;
 
 /* Node selectors the script will search for. Use filter 'hlst_selectors' to change or override these. */
 const NODE_SELECTORS = array(
-	'#groups-dir-list', // BuddyPress.
-	'#members-dir-list', // BuddyPress.
-	'div.bbp-topic-content,div.bbp-reply-content,li.bbp-forum-info,.bbp-topic-title,.bbp-reply-title', // bbPress.
-	'div.entry-content,.wp-block-post-title',
 	'article',
 	'.hentry',
+	'div.wp-block-query', // Gutenberg query block.
+	'div.entry-content',
 	'div.post',
 	'div.post-content',
 	'div.content',
 	'div.page-content',
 	'div.page',
 	'main',
-	'div.wp-block-query', // Gutenberg query block.
 	'#content',
 	'#main',
 	'#middle',
@@ -33,117 +30,56 @@ const NODE_SELECTORS = array(
 	'body', // Last, but not least.
 );
 
-/* DOM events the script will initiate on. Use filter 'hlst_events' to append or override these. */
-const EVENT_LISTENERS = array(
-	'DOMContentLoaded',
-	'post-load',
-);
-
-/* Query variables the plugin will try for. Use filter 'hlst_query_vars' to change or override these. */
-const QUERY_VARS = array(
-	'search_terms',
-	'bbp_search',
-);
-
-/* Input get arguments the plugin will try for. Use filter 'hlst_input_get_args' to change or override these. */
-const INPUT_GET_ARGS = array(
-	'hilite' => FILTER_SANITIZE_ENCODED,
-	// maybe FILTER_SANITIZE_SPECIAL_CHARS or FILTER_SANITIZE_STRING with FILTER_FLAG_NO_ENCODE_QUOTES flag?
-	// see https://www.php.net/manual/en/filter.filters.sanitize.php for more.
-);
-
-require_once __DIR__ . '/inc/class-terms.php';
-
 // -- HOOKING INTO WP -- //
 // Append search query string to results permalinks.
 // 'wp' is the earliest hook where get_query_var('search_terms') will return results.
 
 /**
- * Add URL filters.
- */
-function add_url_filters() {
-	// abort if admin or singular or no search terms.
-	if ( empty( Terms::get() ) ) {
-		return;
-	}
-
-	\add_filter( 'post_link', __NAMESPACE__ . '\add_search_query_arg' );
-	\add_filter( 'post_type_link', __NAMESPACE__ . '\add_search_query_arg' );
-	\add_filter( 'page_link', __NAMESPACE__ . '\add_search_query_arg' );
-	// TODO test replace with \add_filter( 'the_permalink', __NAMESPACE__ . '\\add_search_query_arg' );.
-
-	// for bbPress search result links.
-	\add_filter( 'bbp_get_topic_permalink', __NAMESPACE__ . '\add_search_query_arg' );
-	\add_filter( 'bbp_get_reply_url', __NAMESPACE__ . '\add_search_query_arg' );
-}
-\add_action( 'wp', __NAMESPACE__ . '\add_url_filters' );
-
-/**
- * Add search query arguments.
+ * Split search string into terms.
  *
- * @param string $url The URL.
+ * @param string|array $search The search string to split up into terms.
+ *
+ * @return array
  */
-function add_search_query_arg( $url ) {
-	// we need in_the_loop() check here to prevent apending query to menu links. But it breaks bbPress url support...
-	if ( \in_the_loop() && ! \strpos( $url, 'hilite=' ) ) {
-		$terms = array();
-		foreach ( Terms::get() as $term ) {
-			// $term = str_replace( ' ', '+', $term );
-			$terms[] = \strpos( $term, ' ' ) ? \rawurlencode( '"' . $term . '"' ) : \rawurlencode( $term );
+
+function split( $search ) {
+	if ( \is_array( $search ) ) {
+		return $search;
+	}
+
+	$return = array();
+
+	if ( \preg_match_all( '/([^\s",\+]+)|"([^"]*)"|\'([^\']*)\'/', \stripslashes( \urldecode( $search ) ), $terms ) ) {
+		foreach ( $terms[0] as $term ) {
+			$term = \trim( \str_replace( array( '"', '%22', '%27' ), '', $term ) );
+			if ( ! empty( $term ) ) {
+				$return[] = $term;
+			}
 		}
-		if ( ! empty( $terms ) ) {
-			$url = \add_query_arg( 'hilite', \implode( '+', $terms ), $url );
-		}
 	}
 
-	return $url;
+	return $return;
 }
-
-/**
- * Enqueue main script.
- */
-function enqueue_script() {
-	static $script_enqueued = false;
-
-	// abort if no search terms or script was already enqueued.
-	if ( $script_enqueued || empty( Terms::get() ) ) {
-		return;
-	}
-
-	\wp_enqueue_script( 'mark', \plugins_url( 'js/mark' . ( \defined( '\WP_DEBUG' ) && true == \WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ), array(), '9.0.0', true );
-
-	$terms = array();
-	foreach ( Terms::get() as $term ) {
-		$terms[] = html_entity_decode( wptexturize( $term ) );
-	}
-	$terms     = \wp_json_encode( $terms );
-	$selectors = \wp_json_encode( (array) \apply_filters( 'hlst_selectors', NODE_SELECTORS ) );
-	$events    = (array) \apply_filters( 'hlst_events', EVENT_LISTENERS );
-
-	$script = '/* Highlight Search Terms ( RavanH - http://status301.net/wordpress-plugins/highlight-search-terms/ ) */' . \PHP_EOL;
-	$script .= "(function(){const t={$terms},m={$selectors}," . \PHP_EOL;
-	$script .= 'hlst=function(){for(let n in m){let o=document.querySelectorAll(m[n]);if(!o.length){continue;}for(let i=0;i<o.length;i++){for(let s in t){var j=new Mark(o[i]);j.mark(t[s],{"className":"hilite term-"+s,"exclude":["script","style","title","head","html","mark","iframe","input","textarea"],"separateWordSearch":false});}}if(o.length){break;}}if(typeof Cufon=="function")Cufon.refresh();}' . \PHP_EOL;
-	foreach ( $events as $event ) {
-		$script .= "window.addEventListener('{$event}',hlst);";
-	}
-	$script .= '})()';
-
-	$script = \apply_filters( 'hlst_inline_script', $script );
-
-	\wp_add_inline_script( 'mark', $script );
-
-	$script_enqueued = true;
-}
-\add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\enqueue_script' );
 
 /**
  * Plugin compatibilities
  *
  * @since v.1.8.0
  */
+
 function load_compat() {
 	// Get active plugins.
 	$active_plugins = (array) \get_option( 'active_plugins', array() );
+
+	// BuddyPress compatibility.
+	if ( in_array( 'buddypress/bp-loader.php', $active_plugins ) ) {
+		include_once __DIR__ . '/inc/buddypress.php';
+	}
+
+	// bbPress compatibility.
+	if ( in_array( 'bbpress/bbpress.php', $active_plugins ) ) {
+		include_once __DIR__ . '/inc/bbpress.php';
+	}
 
 	// Search & Filter Pro compatibility.
 	if ( in_array( 'search-filter-pro/search-filter-pro.php', $active_plugins ) ) {
@@ -158,3 +94,128 @@ function load_compat() {
 	}
 }
 \add_action( 'wp_loaded', __NAMESPACE__ . '\load_compat' );
+
+/**
+ * Add the search highlighter script to the footer.
+ *
+ * @since v.1.9.0
+ */
+
+function search_highlighter_script() {
+	?>
+	<script type="text/javascript">
+	function loadMarkJs() {
+		return new Promise((resolve, reject) => {
+			if (typeof Mark !== 'undefined') {
+				resolve();
+				return;
+			}
+			const script = document.createElement('script');
+			script.src = '<?php echo \plugins_url( 'js/mark' . ( \defined( '\WP_DEBUG' ) && true == \WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ); ?>';
+			script.type = 'text/javascript';
+			script.defer = true;
+			script.onload = () => resolve();
+			script.onerror = () => reject(new Error('Mark.js could not be loaded.'));
+			document.head.appendChild(script);
+		});
+	}
+
+	function getSearchParam() {
+		const currentUrl = new URL(window.location.href);
+		let searchTerm = currentUrl.searchParams.get('s');
+
+		if (searchTerm) {
+			return searchTerm.trim();
+		}
+
+		if (document.referrer) {
+			try {
+				const referrerUrl = new URL(document.referrer);
+				if (referrerUrl.hostname === currentUrl.hostname) {
+					searchTerm = referrerUrl.searchParams.get('s');
+					if (searchTerm) {
+						return searchTerm.trim();
+					}
+				}
+			} catch (e) {
+				// Invalid referer URL, ignore.
+			}
+		}
+
+		return null;
+	}
+
+	function splitSearchTerms(search) {
+		if (Array.isArray(search)) return search;
+		if (typeof search !== 'string' || !search.trim()) return [];
+
+		const returnTerms = [];
+		let decodedSearch = '';
+		try {
+			decodedSearch = decodeURIComponent(search);
+		} catch (e) {
+			decodedSearch = search;
+		}
+
+		const regex = /([^\s",\+]+)|"([^"]*)"|'([^']*)'/g;
+		const matches = decodedSearch.matchAll(regex);
+
+		for (const match of matches) {
+			let term = match[0];
+			term = term.replace(/["']|%22|%27/g, '').trim();
+			if (term !== "") {
+				returnTerms.push(term);
+			}
+		}
+		return returnTerms;
+	}
+
+	async function highlightReferrerSearchTerms() {
+		const rawSearchString = getSearchParam();
+		if (!rawSearchString) return;
+
+		const termsArray = splitSearchTerms(rawSearchString);
+		if (!termsArray || termsArray.length === 0) return;
+
+		const NODE_SELECTORS = <?php echo \wp_json_encode( (array) \apply_filters( 'hlst_selectors', NODE_SELECTORS ) ); ?>;
+
+		let context = null;
+		for (const selector of NODE_SELECTORS) {
+			if (document.querySelector(selector)) {
+				context = selector;
+				break;
+			}
+		}
+
+		if (!context) return;
+
+		try {
+			await loadMarkJs();
+		} catch (error) {
+			console.error(error);
+			return;
+		}
+
+		const jsonArrayString = JSON.stringify(termsArray);
+		const finalTermsToMark = JSON.parse(jsonArrayString);
+
+		const instance = new Mark(context);
+		let i = 0;
+
+		finalTermsToMark.forEach(term => {
+			instance.mark(term, {
+				"className": "hilite term-" + i,
+				"accuracy": "partially",
+				"separateWordSearch": false,
+				"diacritics": true,
+				"exclude": ["script", "style", "title", "head", "html", "mark", "iframe", "input", "textarea", ".navigation", ".comment-list"]
+			});
+			i++;
+		});
+	}
+
+	document.addEventListener("DOMContentLoaded", highlightReferrerSearchTerms);
+	</script>
+	<?php
+}
+add_action('wp_footer', __NAMESPACE__ . '\search_highlighter_script', 20);

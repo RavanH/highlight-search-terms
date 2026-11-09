@@ -3,7 +3,7 @@
  * Plugin Name: Highlight Search Terms
  * Plugin URI: http://status301.net/wordpress-plugins/highlight-search-terms
  * Description: Wraps search terms in the HTML5 mark tag. Read <a href="http://wordpress.org/extend/plugins/highlight-search-terms/#faq">FAQ's</a> for instructions and examples for styling the highlights. <a href="https://donate.stripe.com/6oUbJ10Nz8xYfF7b5qdEs01" title="Thank you!">Tip jar</a>.
- * Version: 1.8.5
+ * Version: 1.9.0
  * Author: RavanH
  * Author URI: http://status301.net/
  * Text Domain: highlight-search-terms
@@ -13,7 +13,7 @@
  */
 
 /*
-	Copyright 2024  RavanH  (email : ravanhagen@gmail.com)
+	Copyright 2026  RavanH  (email : ravanhagen@gmail.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
