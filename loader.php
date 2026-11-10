@@ -102,24 +102,39 @@ function load_compat() {
  */
 
 function search_highlighter_script() {
-	?>
-	<script type="text/javascript">
-	function loadMarkJs() {
-		return new Promise((resolve, reject) => {
-			if (typeof Mark !== 'undefined') {
-				resolve();
-				return;
-			}
-			const script = document.createElement('script');
-			script.src = '<?php echo \plugins_url( 'js/mark' . ( \defined( '\WP_DEBUG' ) && true == \WP_DEBUG ? '' : '.min' ) . '.js', __FILE__ ); ?>';
-			script.type = 'text/javascript';
-			script.defer = true;
-			script.onload = () => resolve();
-			script.onerror = () => reject(new Error('Mark.js could not be loaded.'));
-			document.head.appendChild(script);
-		});
+	// Register Mark.js as a first-class script dependency (printed in the
+	// footer) instead of injecting a <script> node at runtime. Dynamically
+	// appended scripts cannot carry a nonce or SRI and are hostile to a strict
+	// Content-Security-Policy; a normally enqueued script is not.
+	static $printed = false;
+	if ( $printed ) {
+		return;
 	}
+	$printed = true;
 
+	$is_debug  = \defined( '\WP_DEBUG' ) && \WP_DEBUG;
+	$mark_file = 'js/mark' . ( $is_debug ? '' : '.min' ) . '.js';
+
+	\wp_register_script(
+		'hlst-mark',
+		\plugins_url( $mark_file, __FILE__ ),
+		array(),
+		'1.9.0', // Keep in sync with the plugin version.
+		true      // In the footer, so it runs after the DOM it marks.
+	);
+	\wp_enqueue_script( 'hlst-mark' );
+
+	// JSON placed inside a <script> element must escape <, >, & and quotes so
+	// no value (here: a node selector) can ever break out of the script tag
+	// with a stray </script>. wp_json_encode() does NOT do this by default.
+	$selectors = \apply_filters( 'hlst_selectors', NODE_SELECTORS );
+	$selectors_json = \wp_json_encode(
+		(array) $selectors,
+		JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+	);
+
+	$script = <<<JS
+(function () {
 	function getSearchParam() {
 		const currentUrl = new URL(window.location.href);
 		let searchTerm = currentUrl.searchParams.get('s');
@@ -170,14 +185,14 @@ function search_highlighter_script() {
 		return returnTerms;
 	}
 
-	async function highlightReferrerSearchTerms() {
+	async function highlightSearchTerms() {
 		const rawSearchString = getSearchParam();
 		if (!rawSearchString) return;
 
 		const termsArray = splitSearchTerms(rawSearchString);
 		if (!termsArray || termsArray.length === 0) return;
 
-		const NODE_SELECTORS = <?php echo \wp_json_encode( (array) \apply_filters( 'hlst_selectors', NODE_SELECTORS ) ); ?>;
+		const NODE_SELECTORS = {$selectors_json};
 
 		let context = null;
 		for (const selector of NODE_SELECTORS) {
@@ -189,20 +204,11 @@ function search_highlighter_script() {
 
 		if (!context) return;
 
-		try {
-			await loadMarkJs();
-		} catch (error) {
-			console.error(error);
-			return;
-		}
-
-		const jsonArrayString = JSON.stringify(termsArray);
-		const finalTermsToMark = JSON.parse(jsonArrayString);
-
+		// Mark.js is enqueued as a dependency, so the global Mark is already
+		// defined and no runtime <script> injection is needed.
 		const instance = new Mark(context);
-		let i = 0;
 
-		finalTermsToMark.forEach(term => {
+		termsArray.forEach((term, i) => {
 			instance.mark(term, {
 				"className": "hilite term-" + i,
 				"accuracy": "partially",
@@ -210,12 +216,18 @@ function search_highlighter_script() {
 				"diacritics": true,
 				"exclude": ["script", "style", "title", "head", "html", "mark", "iframe", "input", "textarea", ".navigation", ".comment-list"]
 			});
-			i++;
 		});
 	}
 
-	document.addEventListener("DOMContentLoaded", highlightReferrerSearchTerms);
-	</script>
-	<?php
+	document.addEventListener("DOMContentLoaded", highlightSearchTerms);
+})();
+JS;
+
+	\wp_add_inline_script( 'hlst-mark', $script );
 }
-add_action('wp_footer', __NAMESPACE__ . '\search_highlighter_script', 20);
+// Enqueue on wp_enqueue_scripts, not wp_footer: wp_print_footer_scripts is
+// itself an action on wp_footer at priority 20, so enqueuing from a wp_footer
+// callback runs too late and the script would never print. wp_enqueue_scripts
+// fires before output, and the in-footer registration below places the script
+// (and its inline highlight logic) at the end of the page where it belongs.
+add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\search_highlighter_script' );
